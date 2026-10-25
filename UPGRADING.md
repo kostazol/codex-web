@@ -43,6 +43,12 @@ the upstream contract checks are explicitly skipped. Follow with browser checks:
 bell, live Priority/recents, filter persistence, opening a chat, and mobile drawer.
 See [Activity evidence and behavior](docs/activity.md).
 
+Also run `node --test tests/mobile.test.cjs` against each patched tree. Preserve
+the mobile navigation store bridge, navigation/panel hooks and hover guards in
+`webview-mobile.patch`. Rebuild the preload to bundle the matching mobile CSS.
+Use the [mobile acceptance checks](docs/mobile-layout.md), including tool tabs,
+repeated drawer dismissal, narrow/landscape screens and Desktop fallback.
+
 ## backing up
 
 we will start by generating a scratch directory and backing it up. first, let's

@@ -96,6 +96,9 @@ scratch directories; decompile only the classes needed for the current review.
 
 ## Validation for this update
 
+For the subsequent Samsung S20 navigation/layout corrections and current mobile
+acceptance contract, see [Mobile interaction contract](mobile-layout.md).
+
 - All four real APKs: valid v3 signature, expected publisher/package, same version code.
 - Inventory tests: path traversal, duplicate entries, recursive packages, verifier
   hash gate, unverified reporting, upstream comparison; real signed fixture accepted,

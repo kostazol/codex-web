@@ -76,6 +76,10 @@ The sidebar's Activity bell is preserved, including Priority, newest-first recen
 chats and the Pinned/Scheduled filters. Its UI and sorting are the original Desktop
 implementation; see [Activity compatibility and validation](docs/activity.md).
 
+Phones and tablets use explicit open/close navigation, dismissible menu sheets
+and full-width tool screens with a return-to-chat action. See the
+[mobile interaction contract](docs/mobile-layout.md) for behavior and QA limits.
+
 The Windows launcher uses Electron's Chromium network stack for Desktop account
 requests. This fixes the workspace-settings 403 seen with Node fetch on this
 host. The application still runs on Node, so SQLite keeps the correct ABI.

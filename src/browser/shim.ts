@@ -110,6 +110,8 @@ type ElectronShimState = {
   initialRoute?: string;
   initialSidebarState?: boolean;
   closeSidebar?: () => void;
+  setSidebarOpen?: (open: boolean) => void;
+  isMobileUI?: () => boolean;
   onMemoryNavigationChanged?: (navigation: MemoryNavigationChange) => void;
   overrideAdapter?: {
     getGateOverride?: (
@@ -354,7 +356,7 @@ function requestWorkspaceDirectoryEntries(
 }
 
 const themeMediaQuery = matchMedia("(prefers-color-scheme: dark)");
-const mobileMediaQuery = matchMedia("(max-width: 768px)");
+const mobileMediaQuery = matchMedia("(max-width: 1024px)");
 const initialSidebarState = !mobileMediaQuery.matches;
 const electronShim = (window.__ELECTRON_SHIM__ ??= {});
 const buildFlavor: "prod" | "dev" | "agent" | string = "prod";
@@ -384,7 +386,8 @@ if (initialRoute.browserPath) {
 }
 
 electronShim.initialSidebarState = initialSidebarState;
-installMobileUI(() => electronShim.closeSidebar?.());
+electronShim.isMobileUI = () => mobileMediaQuery.matches;
+installMobileUI((open) => electronShim.setSidebarOpen?.(open));
 electronShim.onMemoryNavigationChanged = (navigation) => {
   const path = navigation.location.pathname;
   if (navigation.action !== "POP" && mobileMediaQuery.matches) {
