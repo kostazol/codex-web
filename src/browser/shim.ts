@@ -1,5 +1,9 @@
 import { installMobileUI } from "./mobile";
 import {
+  getBrowserGateOverride,
+  type StatsigGateEvaluation,
+} from "./feature-gates";
+import {
   mapBrowserPathToInitialRoute,
   mapMemoryPathToBrowserPath,
 } from "./routes";
@@ -100,12 +104,6 @@ type MemoryNavigationChange = {
     search: string;
     state: unknown;
   };
-};
-
-type StatsigGateEvaluation = {
-  name: string;
-  value: boolean;
-  [key: string]: unknown;
 };
 
 type ElectronShimState = {
@@ -372,24 +370,7 @@ Object.assign(globalThis, {
 });
 
 electronShim.overrideAdapter = {
-  getGateOverride(evaluation) {
-    if (evaluation.name === "2911712394") {
-      return {
-        ...evaluation,
-        value: true,
-      };
-    }
-
-    if (evaluation.name === "1042620455") {
-      // Remote control (Slingshot).
-      return {
-        ...evaluation,
-        value: true,
-      };
-    }
-
-    return null;
-  },
+  getGateOverride: getBrowserGateOverride,
 };
 
 const initialRoute = mapBrowserPathToInitialRoute(

@@ -16,6 +16,33 @@ On Windows, `scripts/prepare-windows.ps1` extracts the installed archive (or
 its version pin and the CLI check in `scripts/start-windows.ps1` together with
 the Unix/Nix pins below. Keep extracted sources and runtime state out of Git.
 
+## Activity and browser feature parity
+
+Keep `src/browser/feature-gates.ts` aligned with the pinned upstream UI. Activity
+uses gate `4039078146` for both the bell and contextual-sidebar selection. Retain
+the shared Statsig override adapter patch on both platforms; do not replace the
+account access checks or rebuild the list from DOM content. Review the native
+recency, unread and interaction-time logic when its bundle contract changes.
+
+Replay the full series on clean **formatted** extracted sources. The output must
+be a new directory. This verifier rejects fuzz and line offsets and can compare
+the result to the running patched sources without replacing them:
+
+```powershell
+node scripts/verify-patches.mjs --platform windows --baseline scratch-installed/asar --output scratch-verify-windows --compare scratch/asar
+$env:CODEX_WEB_ASAR_DIR = (Resolve-Path scratch-verify-windows).Path
+node --test tests/activity.test.cjs
+node scripts/verify-patches.mjs --platform macos --baseline scratch-macos-unmodified --output scratch-verify-macos
+$env:CODEX_WEB_ASAR_DIR = (Resolve-Path scratch-verify-macos).Path
+node --test tests/activity.test.cjs
+```
+
+Use GNU patch (Git for Windows or `patch` on Unix); `CODEX_WEB_PATCH` can select
+its executable. Without `CODEX_WEB_ASAR_DIR`, only the adapter unit tests run and
+the upstream contract checks are explicitly skipped. Follow with browser checks:
+bell, live Priority/recents, filter persistence, opening a chat, and mobile drawer.
+See [Activity evidence and behavior](docs/activity.md).
+
 ## backing up
 
 we will start by generating a scratch directory and backing it up. first, let's

@@ -1,6 +1,6 @@
 --- a/webview/assets/app-initial-438d1df57f70.js
 +++ b/webview/assets/app-initial-438d1df57f70.js
-@@ -529808,7 +529808,7 @@
+@@ -529796,7 +529796,7 @@
      c = Gn(),
      l = fs(),
      u = n != null,

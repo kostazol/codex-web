@@ -72,6 +72,10 @@ Existing local chats and projects are read from the same Codex profile. No
 one-time history import is needed. Native-only Desktop features are not all
 implemented by the browser bridge.
 
+The sidebar's Activity bell is preserved, including Priority, newest-first recent
+chats and the Pinned/Scheduled filters. Its UI and sorting are the original Desktop
+implementation; see [Activity compatibility and validation](docs/activity.md).
+
 The Windows launcher uses Electron's Chromium network stack for Desktop account
 requests. This fixes the workspace-settings 403 seen with Node fetch on this
 host. The application still runs on Node, so SQLite keeps the correct ABI.
