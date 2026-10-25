@@ -146,3 +146,12 @@ that it is running in native Desktop. See [Activity status evidence](activity.md
 for the API distinction, callback ownership, cleanup and validation boundaries.
 Both platform series replay with zero fuzz/offsets, and all 26 targeted tests pass
 against each. The running Windows assets match the verified patch output.
+
+## Browser dictation (2026-10-25)
+
+The 24th patch adds a browser recording/file dialog with native authenticated
+transcription and insertion into the draft. LAN HTTP supports selecting a recorded
+audio file; direct microphone capture requires HTTPS or localhost. Account gates
+remain native. A synthetic WAV was successfully transcribed through the running
+LAN instance without sending a chat message. All 41 targeted checks pass for each
+platform; see [dictation behavior and validation limits](dictation.md).

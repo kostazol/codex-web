@@ -59,6 +59,17 @@ the mobile navigation store bridge, navigation/panel hooks and hover guards in
 Use the [mobile acceptance checks](docs/mobile-layout.md), including tool tabs,
 repeated drawer dismissal, narrow/landscape screens and Desktop fallback.
 
+## Browser dictation
+
+For browser dictation, preserve `webview-dictation.patch`,
+`src/browser/dictation.ts` and `assets/dictation.css`. Recheck the native Codex
+availability policy (`iBt`), recording entry (`CKs`), authenticated multipart
+transcription (`dmo`) and insert-only callback contract. Run
+`node --test tests/dictation.test.cjs` against both patched trees. Verify HTTP file
+transcription and the HTTPS/localhost microphone capability separately; never
+force account/workspace gates or enable insecure-origin microphone flags. See
+[dictation validation](docs/dictation.md).
+
 ## backing up
 
 we will start by generating a scratch directory and backing it up. first, let's
