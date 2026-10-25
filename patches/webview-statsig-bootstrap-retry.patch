@@ -1,12 +1,12 @@
---- a/webview/assets/app-initial-6350d04672d0.js
-+++ b/webview/assets/app-initial-6350d04672d0.js
-@@ -506670,7 +506670,8 @@
-       (PQs = `https://ab.chatgpt.com/v1`),
-       (FQs = `https://ab.chatgpt.com/v1/sdk_exception`),
-       (IQs = 5),
--      (LQs = 5),
+--- a/webview/assets/initialize-app-host-services-5891c906a171.js
++++ b/webview/assets/initialize-app-host-services-5891c906a171.js
+@@ -7980,7 +7980,8 @@
+       (TO = `https://ab.chatgpt.com/v1`),
+       (EO = `https://ab.chatgpt.com/v1/sdk_exception`),
+       (DO = 5),
+-      (OO = 5),
 +      // Use the existing fallback after the first failed bootstrap request.
-+      (LQs = 0),
-       (RQs = 500),
-       (zQs = {
-         networkConfig: { api: PQs, logEventUrl: NGs, sdkExceptionUrl: FQs },
++      (OO = 0),
+       (kO = 500),
+       (AO = {
+         networkConfig: { api: TO, logEventUrl: bm, sdkExceptionUrl: EO },

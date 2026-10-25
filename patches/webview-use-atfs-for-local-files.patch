@@ -1,11 +1,11 @@
---- a/webview/assets/app-shared-8bd9d0399038.js
-+++ b/webview/assets/app-shared-8bd9d0399038.js
-@@ -261189,7 +261189,7 @@
+--- a/webview/assets/app-initial-feb30b196d11.js
++++ b/webview/assets/app-initial-feb30b196d11.js
+@@ -183179,7 +183179,7 @@
    }))();
  }
- function tYr(e) {
--  return `${iYr}${rYr(e)}`;
-+  return rYr(e);
+ function UPn(e) {
+-  return `${KPn}${GPn(e)}`;
++  return GPn(e);
  }
- function nYr(e) {
-   return rYr(e);
+ function WPn(e) {
+   return GPn(e);

@@ -1,0 +1,11 @@
+--- a/webview/assets/app-initial-438d1df57f70.js
++++ b/webview/assets/app-initial-438d1df57f70.js
+@@ -183179,7 +183179,7 @@
+   }))();
+ }
+ function UPn(e) {
+-  return `${KPn}${GPn(e)}`;
++  return GPn(e);
+ }
+ function WPn(e) {
+   return GPn(e);

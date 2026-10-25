@@ -2,6 +2,10 @@
 
 a browser frontend for codex desktop, running on a machine you control.
 
+This fork tracks Codex Desktop **26.1021.31345** and its bundled Codex CLI
+**0.164.0-alpha.11.1**. See [upgrade validation](docs/desktop-26.1021.31345.md)
+for tested behavior and known limitations.
+
 https://github.com/user-attachments/assets/0a33cbd8-741c-412c-9e75-46dfe9324596
 
 ## motivation
@@ -29,16 +33,44 @@ it.
 run it with `npx`:
 
 ```bash
-npx --yes github:0xcaff/codex-web
+npx --yes github:kostazol/codex-web
 ```
 
 or with nix:
 
 ```bash
-nix run github:0xcaff/codex-web
+nix run github:kostazol/codex-web
 ```
 
 then open <http://127.0.0.1:8214> in a browser.
+
+### Windows using an installed Codex Desktop
+
+Requires Node.js 22.12 or newer, Git for Windows, and the pinned Desktop version above.
+Run these commands in PowerShell from this checkout:
+
+```powershell
+npm.cmd ci --ignore-scripts
+npm.cmd rebuild better-sqlite3
+./scripts/prepare-windows.ps1
+npm.cmd run build:browser
+npm.cmd run build:server
+./scripts/start-windows.ps1
+```
+
+Preparation extracts a copy of the installed Desktop archive and applies the
+Windows variants of the same ordered patches used by the Unix build. It does not modify Desktop's
+installation. It refuses to overwrite an existing output directory; preserve
+the old `scratch` directory under another name before preparing again.
+
+The launcher uses Desktop's bundled CLI and existing Codex sign-in. It starts
+a hidden process on `http://127.0.0.1:8214`; logs and its PID are in
+`scratch-runtime/`. To stop only this server, run
+`./scripts/stop-windows.ps1`. It is not installed as a Windows service.
+
+Existing local chats and projects are read from the same Codex profile. No
+one-time history import is needed. Native-only Desktop features are not all
+implemented by the browser bridge.
 
 ### sign in
 
@@ -68,7 +100,7 @@ codex app-server --listen unix://codex-app-server.sock
 then run `codex-web` with the proxy helper:
 
 ```bash
-nix shell github:0xcaff/codex-web github:0xcaff/codex-web#codex_remote_proxy -c bash -lc '
+nix shell github:kostazol/codex-web github:kostazol/codex-web#codex_remote_proxy -c bash -lc '
   export CODEX_UNIX_SOCKET=/tmp/codex-app-server/codex-app-server.sock
   export CODEX_CLI_PATH="$(command -v codex_remote_proxy)"
   codex-web

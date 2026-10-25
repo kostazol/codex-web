@@ -1,27 +1,29 @@
---- a/webview/assets/app-initial-6350d04672d0.js
-+++ b/webview/assets/app-initial-6350d04672d0.js
-@@ -75630,7 +75630,7 @@
-   return Ch(hzt, void 0) !== void 0;
+--- a/webview/assets/app-initial-feb30b196d11.js
++++ b/webview/assets/app-initial-feb30b196d11.js
+@@ -202263,7 +202263,7 @@
+   return _v(e8n, void 0) !== void 0;
  }
- function czt() {
+ function q6n() {
 -  return !0;
 +  return window.__ELECTRON_SHIM__.initialSidebarState;
  }
- function lzt(e) {
+ function J6n(e) {
    return e === `/settings` || !!e?.startsWith(`/settings/`);
-@@ -324142,12 +324142,19 @@
+--- a/webview/assets/initialize-app-host-services-5891c906a171.js
++++ b/webview/assets/initialize-app-host-services-5891c906a171.js
+@@ -1708,12 +1708,19 @@
      ? (i = t[1])
      : ((i = () =>
-         RNe([{ path: `*`, Component: qHa, ErrorBoundary: JHa }], {
+         Le([{ path: `*`, Component: XS, ErrorBoundary: ZS }], {
 -          initialEntries: r,
 +          initialEntries: r ?? [window.__ELECTRON_SHIM__.initialRoute],
          })),
        (t[0] = r),
        (t[1] = i));
--  let [a] = (0, XHa.useState)(i),
+-  let [a] = (0, $S.useState)(i),
 -    o;
-+  let [a] = (0, XHa.useState)(i);
-+  (0, XHa.useEffect)(() =>
++  let [a] = (0, $S.useState)(i);
++  (0, $S.useEffect)(() =>
 +    a.subscribe((state) => {
 +      window.__ELECTRON_SHIM__.onMemoryNavigationChanged({
 +        action: state.historyAction,
@@ -31,4 +33,4 @@
 +  let o;
    t[2] === a
      ? (o = t[3])
-     : ((o = (0, ZHa.jsx)(sHa, { router: a, useTransitions: !1 })),
+     : ((o = (0, eC.jsx)(AS, { router: a, useTransitions: !1 })),

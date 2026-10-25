@@ -1,0 +1,11 @@
+--- a/webview/assets/app-primary-844e405f2b90.js
++++ b/webview/assets/app-primary-844e405f2b90.js
+@@ -35059,7 +35059,7 @@
+   let ft = Pc(dt),
+     pt = `${H ?? 0}px`,
+     mt = ie ? `var(--height-toolbar-sm)` : `0px`,
+-    ht = `${re.left / ne + 6}px`,
++    ht = `0px`,
+     gt = `${re.right / ne}px`,
+     _t;
+   t[107] !== ue ||

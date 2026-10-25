@@ -324,6 +324,10 @@ const appBase = {
     log("app.getGPUInfo", [infoLevel]);
     return { gpuDevice: [] };
   },
+  getGPUFeatureStatus(): { gpu_compositing: string } {
+    // The HTTP host has no Electron compositor or native window backdrop.
+    return { gpu_compositing: "disabled_software" };
+  },
   setName(name: string): void {
     log("app.setName", [name]);
   },
@@ -961,6 +965,8 @@ function createSessionStub(label: string): {
   setPermissionCheckHandler: (...args: unknown[]) => void;
   setPermissionRequestHandler: (...args: unknown[]) => void;
   setPermissionPromptHandler: (...args: unknown[]) => void;
+  setOpenURLHandler: (...args: unknown[]) => void;
+  setWebContentsActivationHandler: (...args: unknown[]) => void;
   setPreferredLanguages: (languages: string[]) => void;
   setWebsiteReportingEnabled: (enabled: boolean) => void;
   webRequest: {
@@ -1017,6 +1023,12 @@ function createSessionStub(label: string): {
     },
     setPermissionPromptHandler(...args: unknown[]): void {
       log(`${label}.setPermissionPromptHandler`, args);
+    },
+    setOpenURLHandler(...args: unknown[]): void {
+      log(`${label}.setOpenURLHandler`, args);
+    },
+    setWebContentsActivationHandler(...args: unknown[]): void {
+      log(`${label}.setWebContentsActivationHandler`, args);
     },
     setPreferredLanguages(languages: string[]): void {
       log(`${label}.setPreferredLanguages`, [languages]);

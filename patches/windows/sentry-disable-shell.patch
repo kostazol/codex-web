@@ -1,0 +1,20 @@
+--- a/.vite/build/worker.js
++++ b/.vite/build/worker.js
+@@ -114606,6 +114606,7 @@
+   let r = CM(e.appVersion),
+     i = e.buildFlavor !== `prod`;
+   (Ase({
++    enabled: !1,
+     dsn: e.dsn,
+     transport: (e) => {
+       let t = Xl(e.bufferSize ?? 64);
+--- a/.vite/build/bootstrap-BYjpvKBK.js
++++ b/.vite/build/bootstrap-BYjpvKBK.js
+@@ -23853,6 +23853,7 @@
+   i && (c = +!!s);
+   let l = _e(r.version);
+   (rE({
++    enabled: !1,
+     ipcMode: _C.Classic,
+     dsn: ME.dsn,
+     transport: MT(EE(t)),

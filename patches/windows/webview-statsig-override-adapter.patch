@@ -1,0 +1,10 @@
+--- a/webview/assets/initialize-app-host-services-b944587b60fb.js
++++ b/webview/assets/initialize-app-host-services-b944587b60fb.js
+@@ -7908,6 +7908,7 @@
+ function hO(e) {
+   let t = {
+     ...AO,
++    overrideAdapter: window.__ELECTRON_SHIM__.overrideAdapter,
+     enableLiveValuesAutoRefresh: !0,
+     ...(e === !0 && !yl()
+       ? {}

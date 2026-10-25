@@ -1,0 +1,22 @@
+--- a/webview/assets/app-shared-955d52676f9c.js
++++ b/webview/assets/app-shared-955d52676f9c.js
+@@ -109560,7 +109560,7 @@
+         }
+       }),
+       (Ugt = class {
+-        encodingLevel = `structuredClonable`;
++        encodingLevel = `jsonCompatible`;
+         constructor(e) {
+           ((this.#e = e),
+             e.start(),
+--- a/.vite/build/main-BPBEjAxi.js
++++ b/.vite/build/main-BPBEjAxi.js
+@@ -222921,7 +222921,7 @@
+   return new u.Nt(r, t, n).getRemoteMain();
+ }
+ var Z_t = class {
+-    encodingLevel = `structuredClonable`;
++    encodingLevel = `jsonCompatible`;
+     constructor(e) {
+       ((this.#e = e),
+         e.start(),

@@ -1,0 +1,10 @@
+--- a/webview/assets/app-initial-438d1df57f70.js
++++ b/webview/assets/app-initial-438d1df57f70.js
+@@ -279429,6 +279429,7 @@
+     n = zwe(e.appVersion),
+     r = e.buildFlavor !== `prod`;
+   (vCi({
++    enabled: !1,
+     beforeBreadcrumb: f_e,
+     beforeSend: xSe,
+     dsn: e.dsn,

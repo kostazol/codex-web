@@ -1,10 +1,10 @@
---- a/webview/assets/app-initial-6350d04672d0.js
-+++ b/webview/assets/app-initial-6350d04672d0.js
-@@ -144501,6 +144501,7 @@
-     n = rpe(e.appVersion),
+--- a/webview/assets/app-initial-feb30b196d11.js
++++ b/webview/assets/app-initial-feb30b196d11.js
+@@ -279429,6 +279429,7 @@
+     n = zwe(e.appVersion),
      r = e.buildFlavor !== `prod`;
-   (E1n({
+   (vCi({
 +    enabled: !1,
-     beforeBreadcrumb: CLe,
-     beforeSend: pNe,
+     beforeBreadcrumb: f_e,
+     beforeSend: xSe,
      dsn: e.dsn,

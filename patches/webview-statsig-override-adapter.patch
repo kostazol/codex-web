@@ -1,10 +1,10 @@
---- a/webview/assets/app-initial-6350d04672d0.js
-+++ b/webview/assets/app-initial-6350d04672d0.js
-@@ -506602,6 +506602,7 @@
- function DQs(e) {
+--- a/webview/assets/initialize-app-host-services-5891c906a171.js
++++ b/webview/assets/initialize-app-host-services-5891c906a171.js
+@@ -7908,6 +7908,7 @@
+ function hO(e) {
    let t = {
-     ...zQs,
+     ...AO,
 +    overrideAdapter: window.__ELECTRON_SHIM__.overrideAdapter,
      enableLiveValuesAutoRefresh: !0,
-     ...(e === !0 ? {} : { disableStorage: !0, loggingEnabled: `disabled` }),
-   };
+     ...(e === !0 && !yl()
+       ? {}

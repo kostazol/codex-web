@@ -1,11 +1,11 @@
---- a/webview/assets/app-initial-6350d04672d0.js
-+++ b/webview/assets/app-initial-6350d04672d0.js
-@@ -221278,7 +221278,7 @@
-   let lt = Dd(ct),
-     ut = `${B ?? 0}px`,
-     dt = re ? `var(--height-toolbar-sm)` : `0px`,
--    ft = `${te.left / U + 6}px`,
-+    ft = `0px`,
-     pt = `${te.right / U}px`,
-     mt;
-   t[102] !== le ||
+--- a/webview/assets/app-primary-7d7313419f84.js
++++ b/webview/assets/app-primary-7d7313419f84.js
+@@ -35059,7 +35059,7 @@
+   let ft = Pc(dt),
+     pt = `${H ?? 0}px`,
+     mt = ie ? `var(--height-toolbar-sm)` : `0px`,
+-    ht = `${re.left / ne + 6}px`,
++    ht = `0px`,
+     gt = `${re.right / ne}px`,
+     _t;
+   t[107] !== ue ||

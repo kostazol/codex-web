@@ -1,0 +1,47 @@
+--- a/webview/assets/app-initial-438d1df57f70.js
++++ b/webview/assets/app-initial-438d1df57f70.js
+@@ -494237,14 +494237,22 @@
+             : CZ({ schema: w, text: e })),
+     ee != null && f != null && !m && (ee = Zha(ee, f, e ?? void 0)));
+   let B = f == null ? null : hRs(m ? f : null, (e) => aRs(S, e)),
++    inputModeDisabled = !1,
++    getAttributes = () => ({
++      "aria-multiline": `true`,
++      dir: `auto`,
++      role: `textbox`,
++      spellcheck: `true`,
++      tabindex: `0`,
++      ...(inputModeDisabled ? {} : { inputmode: `none` }),
++    }),
++    setPointerInputMode = (e) => {
++      inputModeDisabled !== e &&
++        ((inputModeDisabled = e),
++        te.isDestroyed || te.setProps({ attributes: getAttributes }));
++    },
+     te = new Xee(null, {
+-      attributes: {
+-        "aria-multiline": `true`,
+-        dir: `auto`,
+-        role: `textbox`,
+-        spellcheck: `true`,
+-        tabindex: `0`,
+-      },
++      attributes: getAttributes,
+       transformPastedText: N.transformPastedText,
+       transformPastedHTML(e) {
+         if ((N.transformPastedHTML(e), e.length > 1e5)) return ` `;
+@@ -494418,7 +494426,13 @@
+       },
+       handleDOMEvents: {
+         keydown: (e, t) => N.handleKeyEvent(t),
+-        mousedown: (e, t) => N.handleMouseDown(t),
++        mousedown: (e, t) => (setPointerInputMode(!0), N.handleMouseDown(t)),
++        touchstart(e, t) {
++          return (setPointerInputMode(!0), !1);
++        },
++        blur(e, t) {
++          return (setPointerInputMode(!1), !1);
++        },
+         keyup(e, t) {
+           N.handleKeyEvent(t);
+           let { $from: n, empty: r } = e.state.selection;

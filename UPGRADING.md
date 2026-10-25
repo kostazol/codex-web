@@ -3,6 +3,19 @@
 instructions for upgrading codex-web to point at a new version of upstream
 Codex Desktop.
 
+## Windows distribution
+
+The Windows and macOS archives can contain different bundles for the same
+Desktop version. Keep the Mac archive patches in `patches/*.patch` and the
+installed Windows archive variants in `patches/windows/*.patch`. Both use the
+order in `scripts/prepare_asar`. Port and verify each set against its own clean
+archive; do not assume matching version numbers imply matching file hashes.
+
+On Windows, `scripts/prepare-windows.ps1` extracts the installed archive (or
+`-AppAsar`) into a new output folder and applies the Windows variants. Update
+its version pin and the CLI check in `scripts/start-windows.ps1` together with
+the Unix/Nix pins below. Keep extracted sources and runtime state out of Git.
+
 ## backing up
 
 we will start by generating a scratch directory and backing it up. first, let's

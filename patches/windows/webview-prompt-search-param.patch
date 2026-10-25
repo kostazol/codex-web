@@ -1,0 +1,22 @@
+--- a/webview/assets/app-initial-438d1df57f70.js
++++ b/webview/assets/app-initial-438d1df57f70.js
+@@ -529808,7 +529808,7 @@
+     c = Gn(),
+     l = fs(),
+     u = n != null,
+-    d = o?.prefillPrompt,
++    d = o?.prefillPrompt ?? new URLSearchParams(c.search).get(`prompt`),
+     f = o?.prefillPromptFormat,
+     p = o?.prefillPromptOnlyIfEmpty,
+     m = o?.prefillLibraryFolders,
+--- a/webview/assets/app-primary-844e405f2b90.js
++++ b/webview/assets/app-primary-844e405f2b90.js
+@@ -292952,7 +292952,7 @@
+   let xe =
+       _?.prefillPromptOnlyIfEmpty && _.prefillPrompt != null
+         ? void 0
+-        : (_?.prefillPrompt ?? void 0),
++        : (_?.prefillPrompt ?? new URLSearchParams(h).get(`prompt`) ?? void 0),
+     Se;
+   t[64] === h ? (Se = t[65]) : ((Se = jo(h)), (t[64] = h), (t[65] = Se));
+   let Ce = Se,

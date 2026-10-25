@@ -1,0 +1,12 @@
+--- a/webview/assets/app-primary-844e405f2b90.js
++++ b/webview/assets/app-primary-844e405f2b90.js
+@@ -34231,6 +34231,9 @@
+       (r[3] = a))
+     : (a = r[3]);
+   let o = a;
++  window.__ELECTRON_SHIM__.closeSidebar = () => {
++    M3e(e, !1, { animate: t });
++  };
+   vx(`toggleSidebar`, o);
+   let s;
+   (r[4] !== i || r[5] !== e || r[6] !== t

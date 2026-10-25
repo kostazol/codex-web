@@ -1,0 +1,12 @@
+--- a/.vite/build/main-BPBEjAxi.js
++++ b/.vite/build/main-BPBEjAxi.js
+@@ -238144,6 +238144,9 @@
+     updateDockIcon: z,
+     setWindowContext: (e) => {
+       B = e;
++      globalThis.__codexElectronIpcBridge?.setRendererWindowFactory(() =>
++        V.createPrimaryWindow({ show: !1 }),
++      );
+       for (let t of O.BrowserWindow.getAllWindows())
+         !t.isDestroyed() && V.isAppServiceWindow(t) && e.registerWindow(t);
+     },

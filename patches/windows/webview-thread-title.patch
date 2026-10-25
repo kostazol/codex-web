@@ -1,0 +1,14 @@
+--- a/webview/assets/local-conversation-thread-8b01ef08fbc5.js
++++ b/webview/assets/local-conversation-thread-8b01ef08fbc5.js
+@@ -22532,6 +22532,11 @@
+   isScrollToTopEnabled: y,
+   usesUnifiedTimeline: b,
+ }) {
++  let codexHostedWindowTitle = X(Tu, { hostId: r, threadId: t });
++  (0, pF.useEffect)(() => {
++    let title = codexHostedWindowTitle?.trim();
++    title && (document.title = `${title} | Codex`);
++  }, [codexHostedWindowTitle]);
+   let x = Wn(_i),
+     S = ra(`2138468235`).get(`enable_mcp_apps`, !1) && fd(),
+     C = (0, pF.useContext)(H_) === `activity`;

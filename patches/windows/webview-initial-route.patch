@@ -1,0 +1,36 @@
+--- a/webview/assets/app-initial-438d1df57f70.js
++++ b/webview/assets/app-initial-438d1df57f70.js
+@@ -202263,7 +202263,7 @@
+   return _v(e8n, void 0) !== void 0;
+ }
+ function q6n() {
+-  return !0;
++  return window.__ELECTRON_SHIM__.initialSidebarState;
+ }
+ function J6n(e) {
+   return e === `/settings` || !!e?.startsWith(`/settings/`);
+--- a/webview/assets/initialize-app-host-services-b944587b60fb.js
++++ b/webview/assets/initialize-app-host-services-b944587b60fb.js
+@@ -1708,12 +1708,19 @@
+     ? (i = t[1])
+     : ((i = () =>
+         Le([{ path: `*`, Component: XS, ErrorBoundary: ZS }], {
+-          initialEntries: r,
++          initialEntries: r ?? [window.__ELECTRON_SHIM__.initialRoute],
+         })),
+       (t[0] = r),
+       (t[1] = i));
+-  let [a] = (0, $S.useState)(i),
+-    o;
++  let [a] = (0, $S.useState)(i);
++  (0, $S.useEffect)(() =>
++    a.subscribe((state) => {
++      window.__ELECTRON_SHIM__.onMemoryNavigationChanged({
++        action: state.historyAction,
++        location: state.location,
++      });
++    }), [a]);
++  let o;
+   t[2] === a
+     ? (o = t[3])
+     : ((o = (0, eC.jsx)(AS, { router: a, useTransitions: !1 })),

@@ -1,0 +1,12 @@
+--- a/webview/assets/initialize-app-host-services-b944587b60fb.js
++++ b/webview/assets/initialize-app-host-services-b944587b60fb.js
+@@ -7980,7 +7980,8 @@
+       (TO = `https://ab.chatgpt.com/v1`),
+       (EO = `https://ab.chatgpt.com/v1/sdk_exception`),
+       (DO = 5),
+-      (OO = 5),
++      // Use the existing fallback after the first failed bootstrap request.
++      (OO = 0),
+       (kO = 500),
+       (AO = {
+         networkConfig: { api: TO, logEventUrl: bm, sdkExceptionUrl: EO },

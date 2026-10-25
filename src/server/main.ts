@@ -235,6 +235,7 @@ type RendererWindow = {
   id: number;
   webContents: { id: number };
   destroy: () => void;
+  isDestroyed: () => boolean;
 };
 
 type IpcMainBridgeState = {
@@ -380,10 +381,22 @@ function ensureElectronLikeProcessContext(): void {
 
   const versions = process.versions as NodeJS.ProcessVersions & {
     electron?: string;
+    chrome?: string;
   };
   if (!versions.electron) {
     Object.defineProperty(versions, "electron", {
       value: "41.2.0",
+      configurable: true,
+      enumerable: true,
+      writable: false,
+    });
+  }
+
+  // Desktop includes Chromium client hints in requests made by its main process.
+  // Match the Electron version used by this shim even when running in plain Node.
+  if (!versions.chrome) {
+    Object.defineProperty(versions, "chrome", {
+      value: "146.0.7680.179",
       configurable: true,
       enumerable: true,
       writable: false,
@@ -559,6 +572,10 @@ async function startIpcBridgeServer(options: ServerOptions): Promise<void> {
     socket.on("message", async (rawData) => {
       const window = await rendererReady;
       if (!window || socket.readyState !== WebSocket.OPEN) return;
+      if (window.isDestroyed()) {
+        socket.close(1011, "Renderer window is closed");
+        return;
+      }
       let message: RendererToMainMessage;
       try {
         message = JSON.parse(String(rawData)) as RendererToMainMessage;

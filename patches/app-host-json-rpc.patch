@@ -1,20 +1,20 @@
---- a/webview/assets/app-shared-8bd9d0399038.js
-+++ b/webview/assets/app-shared-8bd9d0399038.js
-@@ -119861,7 +119861,7 @@
+--- a/webview/assets/app-shared-2cae01273bae.js
++++ b/webview/assets/app-shared-2cae01273bae.js
+@@ -109560,7 +109560,7 @@
          }
        }),
-       (VFt = class {
+       (Ugt = class {
 -        encodingLevel = `structuredClonable`;
 +        encodingLevel = `jsonCompatible`;
          constructor(e) {
            ((this.#e = e),
              e.start(),
---- a/.vite/build/main-CqEoQDOU.js
-+++ b/.vite/build/main-CqEoQDOU.js
-@@ -159876,7 +159876,7 @@
-   return new l.Mt(r, t, n).getRemoteMain();
+--- a/.vite/build/main-0FVbxCQU.js
++++ b/.vite/build/main-0FVbxCQU.js
+@@ -222921,7 +222921,7 @@
+   return new u.Nt(r, t, n).getRemoteMain();
  }
- var wXe = class {
+ var Z_t = class {
 -    encodingLevel = `structuredClonable`;
 +    encodingLevel = `jsonCompatible`;
      constructor(e) {

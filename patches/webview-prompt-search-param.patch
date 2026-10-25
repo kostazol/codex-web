@@ -1,22 +1,22 @@
---- a/webview/assets/app-initial-6350d04672d0.js
-+++ b/webview/assets/app-initial-6350d04672d0.js
-@@ -615740,7 +615740,7 @@
-     c = Pr(),
-     l = Cc(),
+--- a/webview/assets/app-initial-feb30b196d11.js
++++ b/webview/assets/app-initial-feb30b196d11.js
+@@ -529808,7 +529808,7 @@
+     c = Gn(),
+     l = fs(),
      u = n != null,
 -    d = o?.prefillPrompt,
 +    d = o?.prefillPrompt ?? new URLSearchParams(c.search).get(`prompt`),
      f = o?.prefillPromptFormat,
      p = o?.prefillPromptOnlyIfEmpty,
      m = o?.prefillLibraryFolders,
---- a/webview/assets/app-primary-6f60e9ac4103.js
-+++ b/webview/assets/app-primary-6f60e9ac4103.js
-@@ -140846,7 +140846,7 @@
-   let ie =
-       g?.prefillPromptOnlyIfEmpty && g.prefillPrompt != null
+--- a/webview/assets/app-primary-7d7313419f84.js
++++ b/webview/assets/app-primary-7d7313419f84.js
+@@ -292952,7 +292952,7 @@
+   let xe =
+       _?.prefillPromptOnlyIfEmpty && _.prefillPrompt != null
          ? void 0
--        : (g?.prefillPrompt ?? void 0),
-+        : (g?.prefillPrompt ?? new URLSearchParams(m).get(`prompt`) ?? void 0),
-     ae;
-   t[41] === m ? (ae = t[42]) : ((ae = Wg(m)), (t[41] = m), (t[42] = ae));
-   let oe = ae,
+-        : (_?.prefillPrompt ?? void 0),
++        : (_?.prefillPrompt ?? new URLSearchParams(h).get(`prompt`) ?? void 0),
+     Se;
+   t[64] === h ? (Se = t[65]) : ((Se = jo(h)), (t[64] = h), (t[65] = Se));
+   let Ce = Se,
