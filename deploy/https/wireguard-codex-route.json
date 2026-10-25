@@ -1,0 +1,21 @@
+{
+  "outbound": {
+    "tag": "codex-web-https",
+    "protocol": "freedom",
+    "settings": {
+      "redirect": "web-codex.duckdns.org:443",
+      "finalRules": [
+        { "action": "allow", "network": "tcp", "ip": ["10.250.2.0/24"], "port": "443" },
+        { "action": "block" }
+      ]
+    }
+  },
+  "rule": {
+    "type": "field",
+    "inboundTag": ["in-8443-udp"],
+    "ip": ["192.168.5.110/32"],
+    "port": "443",
+    "network": "tcp",
+    "outboundTag": "codex-web-https"
+  }
+}

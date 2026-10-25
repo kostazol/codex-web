@@ -1,0 +1,15 @@
+[Unit]
+Description=LAN return route for Codex Web HTTPS TCP 443
+Wants=network-online.target
+After=network-online.target wsl-vpnkit.service wsl-vpnkit-routes.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/local/sbin/codex-web-https-lan-route-watch
+ExecStopPost=/usr/local/sbin/codex-web-https-lan-route --remove
+Restart=on-failure
+RestartSec=2
+TimeoutStopSec=5
+
+[Install]
+WantedBy=multi-user.target
