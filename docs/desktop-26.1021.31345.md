@@ -88,3 +88,23 @@ match the runtime files byte for byte. Native macOS/Linux remain untested.
   This upgrade does not change the host's Git trust configuration.
 - The server has no built-in authentication. The Windows launcher defaults to
   loopback and does not add a firewall rule or install a startup service.
+
+## LAN HTTP startup fix (2026-10-25)
+
+Opening the LAN HTTP origin reproduced an indefinite startup logo, with
+`TypeError: crypto.randomUUID is not a function` during Desktop module
+initialization. HTTP 200 and a successful WebSocket upgrade did not catch this
+renderer failure; localhost exposes the native API and hid the problem.
+
+The additional `webview-browser-compat` patch loads `browser-compat.js` as a
+blocking classic script before the preload and all Desktop modules. It only
+supplies a missing UUID v4 implementation, using `crypto.getRandomValues`;
+native implementations remain unchanged. Both preparation scripts already copy
+the compatibility asset from `assets/`. The running server can serve this fix
+without a restart.
+
+Both platform patch sets replay all 21 patches with zero fuzz and zero offsets.
+All 13 UUID/bootstrap-order, Activity and mobile-navigation tests pass against
+each replay. A real browser on the LAN HTTP origin now reaches the composer and
+project list. This does not establish access from a separate phone or routed
+subnet. Browser features requiring a secure context still require HTTPS.

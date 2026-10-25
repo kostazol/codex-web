@@ -1,0 +1,10 @@
+--- a/webview/index.html
++++ b/webview/index.html
+@@ -4,6 +4,7 @@
+     <meta name="referrer" content="origin" />
+     <!-- PROD_BASE_TAG_HERE -->
+     <base href="/" />
++    <script src="./browser-compat.js"></script>
+     <script type="module" src="./assets/preload.js"></script>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />

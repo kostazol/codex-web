@@ -87,6 +87,11 @@ host. The application still runs on Node, so SQLite keeps the correct ABI.
 
 ### Phone and tablet browsers
 
+LAN HTTP startup is supported by an early compatibility script: it supplies
+`crypto.randomUUID` using `crypto.getRandomValues` before Desktop modules load.
+Native HTTPS/localhost UUID generation is preserved. Features that require a
+secure browser context, such as microphone access, still require HTTPS.
+
 At widths up to 768px, navigation becomes a drawer, the chat uses the full width,
 and controls have larger touch targets. The composer follows the visual viewport
 and safe areas. Phone Return inserts a newline; use Send to submit. Desktop
