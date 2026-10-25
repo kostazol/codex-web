@@ -1,0 +1,11 @@
+--- a/webview/assets/app-shared-2cae01273bae.js
++++ b/webview/assets/app-shared-2cae01273bae.js
+@@ -113008,7 +113008,7 @@
+   _St = e;
+ }
+ function gSt(e) {
+-  f$ = e;
++  f$ = window.__ELECTRON_SHIM__?.adaptAppHost?.(e) ?? e;
+ }
+ var _St, f$;
+ function p$() {

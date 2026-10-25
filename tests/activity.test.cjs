@@ -44,6 +44,17 @@ test("unrelated account and rollout gates retain upstream decisions", () => {
   }
 });
 
+test("native voice chat is unavailable in the browser without disabling dictation", () => {
+  assert.equal(
+    getBrowserGateOverride({ name: "2380644311", value: true }).value,
+    false,
+  );
+  assert.equal(
+    getBrowserGateOverride({ name: "4100906017", value: true }),
+    null,
+  );
+});
+
 // Exercise the actual pinned Desktop functions, not a copied implementation.
 // Set this to either freshly replayed platform tree before accepting an upgrade.
 const root = process.env.CODEX_WEB_ASAR_DIR;

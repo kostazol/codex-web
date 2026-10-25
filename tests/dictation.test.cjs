@@ -3,6 +3,24 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+const ts = require("typescript");
+const audioExports = {};
+vm.runInNewContext(
+  ts.transpileModule(
+    fs.readFileSync(
+      path.join(__dirname, "../src/browser/app-host-capabilities.ts"),
+      "utf8",
+    ),
+    {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        target: ts.ScriptTarget.ES2022,
+      },
+    },
+  ).outputText,
+  { exports: audioExports },
+);
+const { adaptBrowserAppHost } = audioExports;
 
 const upstream = { skip: !process.env.CODEX_WEB_ASAR_DIR };
 function source(root = process.env.CODEX_WEB_ASAR_DIR) {
@@ -24,7 +42,7 @@ function between(text, start, end) {
 
 // Execute the actual shipped acquisition/cleanup code with a fake microphone;
 // no recording from the developer's computer and no network transcription.
-function capture({ permission, selectedDevice } = {}) {
+function capture({ permission, selectedDevice, host } = {}) {
   const s = source(),
     state = new Map(),
     tracks = [],
@@ -38,7 +56,7 @@ function capture({ permission, selectedDevice } = {}) {
     return { promise, resolve, reject };
   };
   const scope = {
-    mi: undefined,
+    mi: host,
     navigator: {
       mediaDevices: {
         enumerateDevices: async () => [
@@ -63,7 +81,6 @@ function capture({ permission, selectedDevice } = {}) {
     ra: new Proxy({}, { get: (_, key) => key }),
     Cs: deferred,
     S0: "owner",
-    b0: () => false,
     z1a: (_, active) => state.set("active", active),
     y0: Error,
     DOMException,
@@ -74,13 +91,101 @@ function capture({ permission, selectedDevice } = {}) {
   const definition =
     between(s, "(Z0a = class {", "\n      }));").slice("(Z0a = ".length) +
     "\n}";
-  vm.runInNewContext(helpers + "\nNativeCapture = " + definition, scope);
+  const ownershipCapability = between(
+    s,
+    "function b0() {",
+    "async function U0a(",
+  );
+  vm.runInNewContext(
+    helpers + "\n" + ownershipCapability + "\nNativeCapture = " + definition,
+    scope,
+  );
   const session = new scope.NativeCapture(state, {
     owner: "test",
     onError() {},
   });
   return { session, tracks, calls, state };
 }
+
+test(
+  "browser host never acquires the server microphone or waits for its OS permissions",
+  upstream,
+  async () => {
+    const calls = [];
+    const remote = new Proxy(
+      {},
+      {
+        get: (_, service) =>
+          new Proxy(
+            {},
+            {
+              get: (_, method) => () => {
+                calls.push(`${String(service)}.${String(method)}`);
+                return new Promise(() => {});
+              },
+            },
+          ),
+      },
+    );
+    const browserHost = adaptBrowserAppHost(remote);
+    const r = capture({ host: browserHost });
+    try {
+      assert.equal(await r.session.takeOver(), true);
+      await r.session.start(() => {});
+      assert.equal(
+        r.calls.length,
+        1,
+        "getUserMedia is reached on the browser device",
+      );
+      assert.deepEqual(calls, [], "no native device RPC is sent");
+    } finally {
+      r.session.cancel();
+    }
+    assert.equal(r.tracks[0].stops, 1);
+  },
+);
+
+test("browser host preserves unrelated RPC services and does not mutate the original", () => {
+  const settings = {},
+    streaming = {},
+    voice = {};
+  const remote = {
+    settings,
+    dictationStreaming: streaming,
+    realtimeVoice: voice,
+  };
+  const browserHost = adaptBrowserAppHost(remote);
+  assert.equal(browserHost.settings, settings);
+  assert.equal(browserHost.dictationStreaming, streaming);
+  assert.equal(browserHost.realtimeVoice, undefined);
+  assert.equal(remote.realtimeVoice, voice);
+  assert.equal(adaptBrowserAppHost(undefined), undefined);
+  assert.equal(adaptBrowserAppHost(null), null);
+});
+
+test(
+  "Desktop installs the browser host adapter before exposing services",
+  upstream,
+  () => {
+    const dir = path.join(process.env.CODEX_WEB_ASAR_DIR, "webview/assets");
+    const shared = fs.readFileSync(
+      path.join(
+        dir,
+        fs.readdirSync(dir).find((n) => /^app-shared-.*\.js$/.test(n)),
+      ),
+      "utf8",
+    );
+    const install = between(shared, "function gSt(e) {", "var _St, f$;");
+    const native = { settings: {}, realtimeVoice: {} };
+    const scope = {
+      window: { __ELECTRON_SHIM__: { adaptAppHost: adaptBrowserAppHost } },
+      host: native,
+    };
+    vm.runInNewContext(install + "\ngSt(host);", scope);
+    assert.equal(scope.f$.settings, native.settings);
+    assert.equal(scope.f$.realtimeVoice, undefined);
+  },
+);
 
 test(
   "native microphone availability retains hardware, account and rollout checks",

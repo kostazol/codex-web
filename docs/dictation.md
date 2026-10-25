@@ -17,8 +17,8 @@ fallback and no insecure-origin or account-gate bypass.
 
 The bundled `CKs` hook, `Z0a` capture owner, device selection and `dmo`
 authenticated transcription remain unchanged from the pinned Desktop archive.
-The Electron-only capture API is absent from the browser preload, so upstream
-uses `getUserMedia` and `MediaRecorder`. A saved Desktop microphone device ID
+The browser AppHost adapter omits the server PC's native audio/permission services,
+so upstream uses `getUserMedia` and `MediaRecorder`. A saved Desktop microphone device ID
 falls back to an available browser microphone when that device is unavailable.
 
 Native code owns track release, pending-permission cancellation, recorder state,
@@ -30,7 +30,11 @@ recordings to the PWA asset cache or persist them on the local server.
 
 ## Upgrade contract
 
-`patches/series.json` contains no dictation override. Neither platform applies the
+`webview-browser-audio-host.patch` adapts the AppHost at installation. It omits
+`realtimeVoice`, `realtimeVoiceRuntime`, `microphoneCapture`, `systemPermissions`
+and `dictationAudio`; unrelated services and `dictationStreaming` remain native.
+The browser disables realtime voice UI gate `2380644311`, leaving the Send arrow
+and normal dictation/account policy intact. Neither platform applies the
 former `webview-dictation.patch`, and the preload exposes no `openDictation` hook.
 Preserve this boundary when upgrading: inspect upstream browser support before
 adding any compatibility adapter. Do not copy minified symbol names across
@@ -50,6 +54,26 @@ See [upgrade checks](../UPGRADING.md#browser-dictation). Browser UI and regressi
 results for this change are recorded after deployment below.
 
 ## Deployed verification
+
+### 2026-10-26 correction
+
+The first verification below did not cover a populated remote AppHost. It was
+incorrect to interpret the spinner as a pending browser permission: Desktop's
+`realtimeVoice.acquireMicrophone` stalled before `getUserMedia`, and its capability
+also exposed the unsupported voice-chat Send replacement. The new adapter fixes
+that device boundary without changing native `CKs` recording logic.
+
+- Both 26-patch platform series replay with zero offsets/fuzz.
+- 74 tests pass with no skips, including a remote host whose audio RPCs never
+  resolve: browser capture now starts without invoking any of those RPCs.
+- HTTPS release `f854cfed451a890c1ec53bc3` adopted in the verification browser.
+  The trace now reaches `permission_requested`, `permission_ready` and
+  `device_requested`; cancel restores the microphone and separate Send button.
+  The embedded browser does not complete microphone acquisition, so physical
+  Samsung capture/transcription is still a device acceptance check.
+- HTTP/HTTPS bridge resume and immutable PWA integrity probes pass.
+
+### Earlier verification (superseded for microphone startup)
 
 - The published Windows assets match all 10 files from the clean 25-patch replay;
   the generated preload contains no custom dictation hook.

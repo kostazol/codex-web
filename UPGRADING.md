@@ -74,6 +74,9 @@ the native availability policy (`iBt`), recording entry (`CKs`), capture owner
 `node --test tests/dictation.test.cjs` with `CODEX_WEB_ASAR_DIR` and the matching
 clean `CODEX_WEB_BASELINE_DIR` against both patched trees. This checks that the
 recording hook remains identical to upstream, plus capture/permission cleanup.
+Verify the AppHost adapter against a populated remote host, not only an absent
+bridge: native PC audio services must not intercept browser capture. Keep the
+browser realtime-voice UI gate disabled until that separate feature is supported.
 Verify the native controls on a narrow HTTPS viewport and a real phone separately;
 never force account/workspace gates or enable insecure-origin microphone flags.
 See [dictation validation](docs/dictation.md).
