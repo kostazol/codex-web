@@ -15,7 +15,7 @@ flake-utils.lib.eachSystem systems (
   system:
   let
     pkgs = import nixpkgs { inherit system; };
-    version = "0.164.0-alpha.11.1";
+    version = (builtins.fromJSON (builtins.readFile ../../patches/series.json)).cliVersion;
     platform =
       {
         aarch64-darwin = {

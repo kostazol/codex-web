@@ -23,7 +23,7 @@ def sparkle_name(name: str) -> str:
 
 
 def safe_path_component(value: str) -> str:
-    if "/" in value or "\0" in value:
+    if not value or value in (".", "..") or any(c in value for c in ("/", "\\", "\0", ":")):
         raise ValueError(f"Unexpected path separator in component: {value!r}")
     return value
 
@@ -44,10 +44,7 @@ def download_enclosure(enclosure: etree._Element, dest: Path) -> None:
         resp.raise_for_status()
         data = resp.content
 
-    try:
-        verify_sparkle_signature(data, ed_signature)
-    except RuntimeError as e:
-        print(f"warning {e} for {url}")
+    verify_sparkle_signature(data, ed_signature)
 
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_bytes(data)

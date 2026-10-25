@@ -20,11 +20,16 @@ if ($CodexCliPath) {
     $env:CODEX_CLI_PATH = (Resolve-Path -LiteralPath $CodexCliPath).Path
 }
 if (-not $env:CODEX_CLI_PATH) { throw 'Codex Desktop was not found. Pass -CodexCliPath with its bundled CLI path.' }
+$releasePin = Get-Content -LiteralPath (Join-Path $repoRoot 'patches/series.json') -Raw | ConvertFrom-Json
 $cliVersion = (& $env:CODEX_CLI_PATH --version | Out-String).Trim()
-if ($LASTEXITCODE -ne 0 -or $cliVersion -ne 'codex-cli 0.164.0-alpha.11.1') {
-    throw "Expected codex-cli 0.164.0-alpha.11.1, found '$cliVersion'. Update the Desktop patches and CLI pin together."
+if ($LASTEXITCODE -ne 0 -or $cliVersion -ne "codex-cli $($releasePin.cliVersion)") {
+    throw "Expected codex-cli $($releasePin.cliVersion), found '$cliVersion'. Update the Desktop patches and CLI pin together."
 }
-if (Get-NetTCPConnection -State Listen -LocalPort $Port -ErrorAction SilentlyContinue) { throw "Port $Port is already in use." }
+$conflictingListeners = Get-NetTCPConnection -State Listen -LocalPort $Port -ErrorAction SilentlyContinue | Where-Object {
+    $ListenAddress -in @('0.0.0.0', '::') -or $_.LocalAddress -in @('0.0.0.0', '::', $ListenAddress)
+}
+# A LAN portproxy may already use this port on a different address.
+if ($conflictingListeners) { throw "Port $Port is already in use on $ListenAddress." }
 $runtime = Join-Path $repoRoot 'scratch-runtime'
 New-Item -ItemType Directory -Path $runtime -Force | Out-Null
 $server = Start-Process -FilePath (Get-Command node.exe).Source `

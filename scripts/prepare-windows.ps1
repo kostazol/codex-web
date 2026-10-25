@@ -6,13 +6,17 @@ param(
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location -LiteralPath $repoRoot
-$expectedVersion = '26.1021.31345'
+$releasePin = Get-Content -LiteralPath (Join-Path $repoRoot 'patches/series.json') -Raw | ConvertFrom-Json
+$expectedVersion = $releasePin.desktopVersion
 if (-not $AppAsar) {
     $desktop = Get-AppxPackage -Name OpenAI.Codex | Sort-Object Version -Descending | Select-Object -First 1
     if (-not $desktop) { throw 'Codex Desktop was not found. Pass -AppAsar with the path to its app.asar.' }
     $AppAsar = Join-Path $desktop.InstallLocation 'app/resources/app.asar'
 }
 $AppAsar = (Resolve-Path -LiteralPath $AppAsar).Path
+if ((Get-FileHash -LiteralPath $AppAsar -Algorithm SHA256).Hash -ne $releasePin.windowsArchiveSha256) {
+    throw 'Installed Desktop archive changed. Port and verify the patch series before updating its pinned digest.'
+}
 $output = [IO.Path]::GetFullPath((Join-Path $repoRoot $OutputDirectory))
 if (-not $output.StartsWith($repoRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
     throw 'OutputDirectory must be inside this checkout.'
@@ -36,17 +40,7 @@ Invoke-Checked (Join-Path $repoRoot 'node_modules/.bin/sharp.cmd') @(
     'resize', '384', '384', '--fit', 'inside', '--', 'flatten', 'white', '--',
     'extend', '64', '64', '64', '64', '--background', 'white', '--', 'removeAlpha'
 )
-$prepareSource = Get-Content -LiteralPath 'scripts/prepare_asar' -Raw
-$patches = [regex]::Matches($prepareSource, '< (patches/[^\s]+\.patch)') |
-    ForEach-Object { Join-Path 'patches/windows' ([IO.Path]::GetFileName($_.Groups[1].Value)) }
-$files = foreach ($patch in $patches) {
-    [regex]::Matches((Get-Content -LiteralPath $patch -Raw), '(?m)^\+\+\+ b/([^\r\n]+)') |
-        ForEach-Object { Join-Path $output $_.Groups[1].Value }
-}
-Invoke-Checked (Join-Path $repoRoot 'node_modules/.bin/prettier.cmd') (@('--ignore-path', '.prettierignore', '--write') + @($files | Sort-Object -Unique))
-foreach ($patch in $patches) {
-    Invoke-Checked $patchExe @('--batch', '--forward', '--strip', '1', '--directory', $output, '--input', (Join-Path $repoRoot $patch))
-}
+Invoke-Checked 'node.exe' @('scripts/apply-patches.mjs', 'windows', $output)
 # Electron's SQLite binary uses another ABI. Resolve the host Node dependency.
 $sqlite = [IO.Path]::GetFullPath((Join-Path $output 'node_modules/better-sqlite3'))
 if (-not $sqlite.StartsWith($output + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw 'Unsafe SQLite path.' }

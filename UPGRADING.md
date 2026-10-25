@@ -8,13 +8,13 @@ Codex Desktop.
 The Windows and macOS archives can contain different bundles for the same
 Desktop version. Keep the Mac archive patches in `patches/*.patch` and the
 installed Windows archive variants in `patches/windows/*.patch`. Both use the
-order in `scripts/prepare_asar`. Port and verify each set against its own clean
+order in `patches/series.json`. Port and verify each set against its own clean
 archive; do not assume matching version numbers imply matching file hashes.
 
 On Windows, `scripts/prepare-windows.ps1` extracts the installed archive (or
 `-AppAsar`) into a new output folder and applies the Windows variants. Update
-its version pin and the CLI check in `scripts/start-windows.ps1` together with
-the Unix/Nix pins below. Keep extracted sources and runtime state out of Git.
+the shared Desktop/CLI pins and archive digests in `patches/series.json`, plus
+the platform CLI package integrity values in `nix/codex/default.nix`. Keep extracted sources and runtime state out of Git.
 
 ## Activity and browser feature parity
 
@@ -76,97 +76,64 @@ transcription and the HTTPS/localhost microphone capability separately; never
 force account/workspace gates or enable insecure-origin microphone flags. See
 [dictation validation](docs/dictation.md).
 
-## backing up
+## Safe preparation and publication
 
-we will start by generating a scratch directory and backing it up. first, let's
-get the `scratch` directory to a known state by running the following
+1. Keep the running prepared tree and its source revision as the rollback point.
+   Do not delete or modify it to test a Desktop upgrade. Keep production
+   `scratch-pwa/` outside the candidate tree.
+2. Obtain the intended official Desktop archive and bundled CLI. Port each platform
+   separately; update `patches/series.json` only after reviewing the new sources.
+   The Windows archive SHA-256, Mac ZIP SHA-256, Desktop version and CLI version
+   are pinned there. Nix CLI integrity hashes also need updating when CLI changes.
+   The download inventory tool refuses invalid signatures. Changing just a version
+   string is not an upgrade.
+3. Extract an untouched baseline, format the patched files with the locked Prettier,
+   and port the small bundle hooks. Keep mobile UI, cache and transport logic in
+   maintained `src/browser`, `src/server`, and `assets` modules. Generate each
+   patch with a diff against the output of all preceding patches; never hand-write
+   hunk counts. Add it to the shared ordered series for both platforms.
+4. Replay the series with `scripts/verify-patches.mjs` as above. Production
+   preparation uses the same strict applicator: any failed hunk, fuzz or line
+   offset stops it. Both platform trees must pass the contract tests.
+5. On Windows, prepare and build in a new directory (choose a fresh name per run):
 
-```bash
-rm -rf scratch scratch-backup # remove existing past scratch directories to start from clean state
-DEV=1 nix develop --command yarn run prepare:asar 
-mv scratch scratch-backup
+```powershell
+./scripts/prepare-windows.ps1 -AppAsar 'C:/path/to/reviewed/app.asar' -OutputDirectory scratch-candidate/asar
+$env:CODEX_WEB_ASAR_DIR = (Resolve-Path scratch-candidate/asar).Path
+$env:CODEX_WEB_PWA_DIR = Join-Path (Get-Location) 'scratch-candidate-pwa'
+npm.cmd run build:server
+npm.cmd run build:browser
+node --test tests/*.test.cjs
+python -m unittest discover -s tests -p 'test_*.py'
+Remove-Item Env:CODEX_WEB_ASAR_DIR
+Remove-Item Env:CODEX_WEB_PWA_DIR
 ```
 
-the `scratch-backup` directory holds the patched, working version of codex-web.
-we will use this when moving the patches over to the new version to understand
-the context the patches were being applied in.
+The build emits an immutable release inventory and worker plus content-addressed
+public assets. It never caches RPC, local project files or conversation data.
+A test marker is not a substitute for browser checks of existing history, a new
+prompt, Activity, mobile sheets, dictation, deep-link reload and sleep/resume.
+Native macOS/Linux runtime acceptance still needs those platforms.
 
-## updating urls
+6. Publish in a maintenance window: stop only Codex Web, retain the current
+   `scratch/asar` as a uniquely named backup within the checkout, and switch in
+   the verified candidate. Keep the production `scratch-pwa` directory. Build
+   the matching server/browser and run `build:pwa` with the production store
+   before starting the new server. Do not rebuild files underneath active
+   first-load clients. Server releases must accept the previous browser wire
+   protocol while old cached windows remain. Do not replace the shared nginx or
+   change its other sites to publish a Codex update.
+7. Check HTTP/HTTPS, opening an existing chat and the browser console. Confirm
+   active/latest PWA versions in the diagnostic DOM attributes. A waiting update
+   takes effect after old Codex Web windows close; never force-reload a draft.
+8. If verification fails, stop Codex Web and restore the previous source revision
+   and prepared tree, rebuild its server, retain the immutable object store, then
+   restart with its matching CLI. Keep old protocol support until clients finish
+   transitioning. A worker cannot be assumed compatible with an arbitrary older
+   server; roll back the server and browser release as a tested pair.
 
-there are a few places to update next.
+Desktop updates are intentionally manual. Failing closed on an unknown archive
+is preferable to silently publishing partly applied patches.
 
-1. `appVersion` in default.nix and `hash` in `codexZip`.
-2. `APP_VERSION` in ./scripts/prepare
-
-then temporarily comment out the patch lines in ./scripts/prepare_asar and run
-
-```bash
-DEV=1 nix develop --command yarn run prepare:asar 
-cp -r scratch scratch-new-version-unmodified
-```
-
-## upgrading the codex-cli version
-
-this part can be run concurrently with the rest of the upgrade process. make
-sure to wait for its completion before doing validation. run it in a subagent.
-
-run the following to get the version of the new codex-cli
-
-```bash
-scratch/ChatGPT.app/Contents/Resources/codex-cli/bin/codex --version
-```
-
-then update the `nix/codex/default.nix` file's `version` field and hashes to
-point to the new version.
-
-## porting over patches
-
-now we have a few folders
-
-* `scratch-backup`: patches applied on top of old version of Codex Desktop
-* `scratch-new-version-unmodified`: plain extracted new version of Codex Desktop
-* `scratch`: working copy we will be modifying
-
-now carefully look at the patches in `patches/` and how they were applied in
-`scratch-backup` and bring the changes over to `scratch`. apply them directly
-in-tree first. don't worry immediately about updating the patches yet.
-
-## updating patches
-
-once the patches have been made in `scratch`, diff the changes in `scratch`
-against `scratch-new-version-unmodified` and update the patches in `patches/`.
-always generate the patches by running `diff` and always avoid writing the
-patches manually as it's very easy to get them wrong.
-
-once that is done, uncomment the patch lines in `scripts/prepare_asar` and run
-
-```bash
-mv scratch scratch-patched-inplace
-rm -rf scratch
-DEV=1 nix develop --command yarn run prepare:asar 
-```
-
-then diff `./scratch-patched-inplace` with the resulting `./scratch` to validate
-the patches were applied as expected.
-
-## validation
-
-to validate things are still working, we'll first validate the server, then the
-client. before starting this step, make sure to wait for the
-`upgrading the codex-cli version` subagent to finish.
-
-to validate the server, run the following
-
-```bash
-nix develop --command yarn server
-```
-
-next validate the client by opening a browser window to `http://localhost:8214`
-and validating things show up on the page.
-
-look in the console for errors. also, look on the screen to see whether any
-error dialogs popped up. sometimes errors occur, but they're silent and exhibit
-as loading taking forever (more than 1m). look out for that case too.
-
-if there are errors, bring them to the users attention and we will decide how to
-proceed.
+See [the architecture review](docs/architecture-review-2026-10-25.md) and
+[PWA release behavior](docs/pwa-cache.md) for the validated boundaries.

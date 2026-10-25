@@ -1,0 +1,51 @@
+--- a/webview/index.html
++++ b/webview/index.html
+@@ -4,12 +4,12 @@
+     <meta name="referrer" content="origin" />
+     <!-- PROD_BASE_TAG_HERE -->
+     <base href="/" />
+-    <script src="./browser-compat.js"></script>
+-    <script type="module" src="./assets/preload.js"></script>
++    <script src="/browser-compat.js"></script>
++    <script type="module" src="/assets/preload.js"></script>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+     <title>ChatGPT</title>
+-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
++    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+     <link rel="manifest" href="/manifest.json" />
+     <style>
+       /* Dependency CSS can load before app.css, so establish Tailwind's layer order here. */
+@@ -144,27 +144,27 @@
+     <script
+       type="module"
+       crossorigin
+-      src="./assets/index-340508751504.js"
++      src="/assets/index-340508751504.js"
+     ></script>
+     <link
+       rel="modulepreload"
+       crossorigin
+-      href="./assets/rolldown-runtime-2d059c5e81f4.js"
++      href="/assets/rolldown-runtime-2d059c5e81f4.js"
+     />
+     <link
+       rel="modulepreload"
+       crossorigin
+-      href="./assets/index.client-17f4cd7252fb.js"
++      href="/assets/index.client-17f4cd7252fb.js"
+     />
+     <link
+       rel="modulepreload"
+       crossorigin
+-      href="./assets/app-shared-955d52676f9c.js"
++      href="/assets/app-shared-955d52676f9c.js"
+     />
+     <link
+       rel="stylesheet"
+       crossorigin
+-      href="./assets/app-shared-bd3e4e649b69.css"
++      href="/assets/app-shared-bd3e4e649b69.css"
+     />
+   </head>
+   <body tabindex="0" style="outline: none">

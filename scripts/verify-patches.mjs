@@ -2,7 +2,11 @@
 // Replay the actual preparation order without replacing a working installation.
 import fs from "node:fs";
 import path from "node:path";
-import { spawnSync } from "node:child_process";
+import {
+  series as loadSeries,
+  patchedFiles,
+  applySeries,
+} from "./patch-series.mjs";
 import { parseArgs } from "node:util";
 
 const { values } = parseArgs({
@@ -24,58 +28,14 @@ if (
 const baseline = path.resolve(values.baseline),
   output = path.resolve(values.output);
 if (fs.existsSync(output)) throw Error(`Refusing to overwrite ${output}`);
-const dir = values.platform === "windows" ? "patches/windows" : "patches";
-const series = [
-  ...fs
-    .readFileSync("scripts/prepare_asar", "utf8")
-    .matchAll(/< patches\/([^\s]+\.patch)/g),
-].map((m) => path.join(dir, m[1]));
-if (!series.length) throw Error("No patch series found");
-const files = [
-  ...new Set(
-    series.flatMap((p) =>
-      [...fs.readFileSync(p, "utf8").matchAll(/^\+\+\+ b\/([^\r\n]+)/gm)].map(
-        (m) => m[1],
-      ),
-    ),
-  ),
-];
-for (const file of files) {
-  if (path.isAbsolute(file) || /(^|[\\/])\.\.([\\/]|$)/.test(file))
-    throw Error("Unsafe patch path");
-  if (!fs.statSync(path.join(baseline, file)).isFile())
-    throw Error(`Missing baseline file: ${file}`);
-}
-let patch = process.env.CODEX_WEB_PATCH ?? "patch";
-if (!process.env.CODEX_WEB_PATCH && process.platform === "win32") {
-  const found = spawnSync("where.exe", ["git.exe"], { encoding: "utf8" });
-  if (found.status !== 0) throw Error("Git for Windows is required");
-  const git = found.stdout.trim().split(/\r?\n/)[0];
-  patch = path.join(path.dirname(path.dirname(git)), "usr/bin/patch.exe");
-}
+const series = loadSeries(values.platform);
+const files = patchedFiles(series);
 for (const file of files) {
   const target = path.join(output, file);
   fs.mkdirSync(path.dirname(target), { recursive: true });
   fs.copyFileSync(path.join(baseline, file), target);
 }
-for (const file of series) {
-  const result = spawnSync(
-    patch,
-    [
-      "--batch",
-      "--forward",
-      "--fuzz=0",
-      "-p1",
-      "-d",
-      output,
-      "-i",
-      path.resolve(file),
-    ],
-    { encoding: "utf8" },
-  );
-  if (result.status !== 0 || /\b(fuzz|offset)\b/i.test(result.stdout))
-    throw Error(`${file}\n${result.stdout}${result.stderr}`);
-}
+applySeries(values.platform, output);
 if (values.compare) {
   for (const file of files) {
     if (
