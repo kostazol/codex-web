@@ -59,3 +59,42 @@ are version-specific and must be reviewed on upgrade.
 
 See [UPGRADING.md](../UPGRADING.md) for repeatable checks. Desktop extracted sources
 and screenshots of local chats stay out of Git.
+
+## Live status before opening a chat (2026-10-25)
+
+The browser's independent app-server returned `notLoaded` from `thread/list` for
+chats actively running in native Desktop, with or without `useStateDbOnly`.
+`thread/loaded/list` only covered that app-server's own loaded chats. Neither is
+an authoritative list of active chats across Desktop windows/processes.
+
+`webview-thread-activity.patch` connects local/remote-host `recentThreads` and
+`listState` subscriptions to the existing `retainActiveConversation` mechanism.
+It requests an owner snapshot over client coordination and then follows native
+revisioned stream patches. It does not resume chats, start turns, mark them read,
+or infer activity from timestamps. Cloud-host subscriptions retain their native
+behavior. List changes and subscription disposal release follower interests;
+native refcounts preserve interests held by an open chat or another subscriber.
+This uses the existing owner stream, including its snapshot payload, rather than
+introducing a new public HTTP API or repeatedly polling all archived history.
+
+The adapter deliberately retains Desktop's `Yw.subscribe` RPC callback ownership
+before wrapping the listener. Replacing that callback with an ordinary closure
+first loses its remote lifetime after the subscription call returns. A regression
+test executes the extracted subscription adapter and verifies delivery after the
+original RPC argument has been released, plus cleanup of the retained copy.
+
+Catalog-only rows previously short-circuited attention to unread/idle unless the
+chat was selected. They now consume the live list state and the native pending
+request calculation. Activity also recalculates status when the last-message
+timestamp is unchanged. Waiting, unread holds, grouping and recency retain their
+existing priority. The changes are conditional on the browser bridge.
+
+Validation: a fresh LAN HTTP home page, without entering any chat, showed two
+native Desktop chats as **Working** in Activity/Priority. Their preview continued
+updating while the list stayed open. No message, resume or read action was used
+for the check. Waiting/idle transitions and unchanged-recency updates are covered
+by executable regression tests; no approval was created in a real user chat.
+All 26 Activity, thread-status, mobile, HTTP compatibility and audio tests passed
+against both clean replays. Each platform applied 23 patches with zero fuzz and
+offsets; Windows replay matched the running sources. macOS runtime and a physical
+phone were not tested in this change.

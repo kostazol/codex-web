@@ -1,0 +1,48 @@
+--- a/webview/assets/app-initial-feb30b196d11.js
++++ b/webview/assets/app-initial-feb30b196d11.js
+@@ -134993,6 +134993,11 @@ function C8t() {
+           return (n.onRpcBroken(() => i.unsubscribe()), i);
+         }
+         subscribe(e) {
++          if (window.__ELECTRON_SHIM__?.subscribeThreadActivity &&
++              ((e.type === `host` && e.field === `recentThreads`) ||
++               (e.type === `thread` && e.field === `listState`)))
++            return pT(Yw.subscribe(e.listener, (listener) =>
++              window.__ELECTRON_SHIM__.subscribeThreadActivity(this.#e(), { ...e, listener })));
+           switch (e.type) {
+             case `host`:
+               return pT(this.#e().subscribe(e));
+@@ -286292,6 +286297,13 @@ function GG(e, t) {
+ }
+ function oMi(e, t) {
+   let n = e(ZG).byKey.get(t);
++  if (window.__ELECTRON_SHIM__?.getThreadAttentionState && n != null) {
++    let key = { hostId: n.summary.hostId, threadId: n.summary.conversationId };
++    return window.__ELECTRON_SHIM__.getThreadAttentionState(
++      e(mj, key), aMi(e, t),
++      e(pAi, { hostId: key.hostId, conversationId: key.threadId }),
++    );
++  }
+   return n != null && qTn(e, n.summary.conversationId) == null
+     ? aMi(e, t)
+       ? `unread`
+@@ -313972,7 +313984,9 @@ function K5i() {
+         let r = t(ZG).byKey.get(e),
+           i;
+         i =
+-          r != null && qTn(t, r.summary.conversationId) == null
++          window.__ELECTRON_SHIM__?.getThreadAttentionState && r != null
++            ? oMi(t, e)
++            : r != null && qTn(t, r.summary.conversationId) == null
+             ? (t(Hki, {
+                 hostId: r.summary.hostId,
+                 threadId: r.summary.conversationId,
+@@ -313986,7 +314000,7 @@ function K5i() {
+           c = s.get(e),
+           l = o.size === 0 && c?.heldUnread !== o,
+           u =
+-            c?.recencyAt === a && !l
++            !window.__ELECTRON_SHIM__?.getThreadAttentionState && c?.recencyAt === a && !l
+               ? c.attentionState
+               : B5i(i, o.get(e) === a);
+         return (

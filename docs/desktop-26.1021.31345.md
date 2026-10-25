@@ -137,3 +137,12 @@ Both 22-patch platform sets replay with zero fuzz/offsets. All 15 audio startup,
 HTTP compatibility, Activity and mobile navigation tests pass against each set.
 The audio tests verify no browser startup context, lazy context creation/reuse,
 and preservation of native prewarming. Physical audio hardware is not tested.
+
+## Initial chat activity (2026-10-25)
+
+The 23rd patch restores owner-following for list subscriptions and live attention
+for catalog-only rows. Activity no longer relies on opening a chat to discover
+that it is running in native Desktop. See [Activity status evidence](activity.md#live-status-before-opening-a-chat-2026-10-25)
+for the API distinction, callback ownership, cleanup and validation boundaries.
+Both platform series replay with zero fuzz/offsets, and all 26 targeted tests pass
+against each. The running Windows assets match the verified patch output.

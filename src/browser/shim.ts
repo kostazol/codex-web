@@ -1,4 +1,5 @@
 import { installMobileUI } from "./mobile";
+import { subscribeThreadActivity, getThreadAttentionState } from "./thread-activity";
 import {
   getBrowserGateOverride,
   type StatsigGateEvaluation,
@@ -107,6 +108,8 @@ type MemoryNavigationChange = {
 };
 
 type ElectronShimState = {
+  subscribeThreadActivity?: typeof subscribeThreadActivity;
+  getThreadAttentionState?: typeof getThreadAttentionState;
   initialRoute?: string;
   initialSidebarState?: boolean;
   closeSidebar?: () => void;
@@ -359,6 +362,8 @@ const themeMediaQuery = matchMedia("(prefers-color-scheme: dark)");
 const mobileMediaQuery = matchMedia("(max-width: 1024px)");
 const initialSidebarState = !mobileMediaQuery.matches;
 const electronShim = (window.__ELECTRON_SHIM__ ??= {});
+electronShim.subscribeThreadActivity = subscribeThreadActivity;
+electronShim.getThreadAttentionState = getThreadAttentionState;
 const buildFlavor: "prod" | "dev" | "agent" | string = "prod";
 
 Object.assign(globalThis, {

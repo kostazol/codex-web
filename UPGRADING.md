@@ -43,6 +43,16 @@ the upstream contract checks are explicitly skipped. Follow with browser checks:
 bell, live Priority/recents, filter persistence, opening a chat, and mobile drawer.
 See [Activity evidence and behavior](docs/activity.md).
 
+Preserve `webview-thread-activity.patch` and `src/browser/thread-activity.ts`.
+Recheck the native list subscription RPC lifetime (`Yw.subscribe`), follower
+retention/disposal, catalog attention selector (`oMi`) and Activity recency cache
+(`G5i`) against the new bundle. Run `node --test tests/thread-activity.test.cjs`
+with `CODEX_WEB_ASAR_DIR` set for each platform. A fresh browser home page must
+show a chat running in another Desktop window before selecting it. Verify live
+updates and distinguish active spinners from unread dots. `thread/list` and
+`thread/loaded/list` from a separate app-server do not establish cross-client
+activity. Do not use mass resume or mark-read operations to populate indicators.
+
 Also run `node --test tests/mobile.test.cjs` against each patched tree. Preserve
 the mobile navigation store bridge, navigation/panel hooks and hover guards in
 `webview-mobile.patch`. Rebuild the preload to bundle the matching mobile CSS.
