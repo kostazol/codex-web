@@ -1,0 +1,37 @@
+--- a/webview/assets/app-primary-7d7313419f84.js
++++ b/webview/assets/app-primary-7d7313419f84.js
+@@ -30940,13 +30940,16 @@ function LDt(e) {
+ }
+ function RDt(e, t) {
+   if (e.get(rP, t)) {
++    window.__ELECTRON_SHIM__?.saveActivityView?.(t, false);
+     GN(e);
+     return;
+   }
+   (BDt(e), VDt(e, t));
++  window.__ELECTRON_SHIM__?.saveActivityView?.(t, e.get(rP, t));
+ }
+ function zDt(e, t) {
+   (Xv(e, gr, { item: `activity` }), BDt(e), VDt(e, t));
++  window.__ELECTRON_SHIM__?.saveActivityView?.(t, e.get(rP, t));
+ }
+ function BDt(e) {
+   e.set(vOt, !0);
+@@ -152634,6 +152637,9 @@ function c6n(e) {
+     c = Z(AOt, r),
+     l = Z(Tg, `togglePriorityFilter`),
+     u;
++  (0, T6n.useEffect)(() => {
++    window.__ELECTRON_SHIM__?.restoreActivityView?.(a.node, r, () => VDt(a, r));
++  }, [a, r]);
+   t[0] !== a || t[1] !== r
+     ? ((u = () => RDt(a, r)), (t[0] = a), (t[1] = r), (t[2] = u))
+     : (u = t[2]);
+@@ -152658,6 +152664,7 @@ function c6n(e) {
+         BDt(a);
+       }),
+       (h = () => {
++        window.__ELECTRON_SHIM__?.saveActivityView?.(a.get(eC)?.sidebarMode, false);
+         GN(a);
+       }),
+       (t[9] = a),

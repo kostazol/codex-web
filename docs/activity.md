@@ -28,8 +28,8 @@ gate evaluations are not changed.
 - Priority entries are not duplicated in the chronological section. The native
   reactive subscriptions continue updating the list while it is open.
 - The options retain Priority, Pinned and Scheduled filters and native read/archive
-  actions. Filter preferences persist; the Activity view itself can reopen closed
-  after a page reload, as a view state rather than a saved filter preference.
+  actions. Filter preferences persist. The browser also remembers whether the
+  Activity bell was enabled, separately for Codex and ChatGPT (see below).
 
 Evidence in the clean bundles: primary functions `DDt`/`ODt` control availability,
 `c6n`/`l6n` render the bell, `u6n` renders options, `tOt` groups/sorts recents,
@@ -98,3 +98,28 @@ All 26 Activity, thread-status, mobile, HTTP compatibility and audio tests passe
 against both clean replays. Each platform applied 23 patches with zero fuzz and
 offsets; Windows replay matched the running sources. macOS runtime and a physical
 phone were not tested in this change.
+
+## Remembering the Activity bell (2026-10-25)
+
+`webview-activity-view.patch` preserves explicit bell activation/deactivation and
+its keyboard shortcut in localStorage, under `codex-web:activity-view:<mode>`.
+Codex and ChatGPT have separate preferences. This is per browser profile/origin;
+HTTP, HTTPS, localhost and a LAN IP do not share localStorage.
+
+On the first bell mount for each mode/store, the browser restores an enabled
+preference through Desktop's native activation flow (`VDt`), including its live
+subscription. It stores both true and false. Internal view resets, navigation and
+sidebar dismissal do not overwrite the user's explicit preference. Storage errors
+or invalid values retain the native default and do not break the toggle. No chat
+content, account identifier or activity snapshot is stored.
+
+Upgrade contracts: `RDt` is the shortcut toggle, `zDt` the activation action,
+`c6n` owns the bell's mount/close handlers. Keep the browser-only bridge and both
+platform patches aligned. Verify enabled and disabled states across reloads and
+fresh visits, and retain the original account/feature checks.
+
+Validated in the running LAN browser: enabled survived reload, disabled survived
+reload, and a fresh same-origin tab restored the disabled choice. The original
+disabled preference was left in place after testing. Both 25-patch series replay
+with zero fuzz/offsets; Windows replay matches runtime. All 41 existing targeted
+regression checks pass on each platform. macOS runtime was not launched.

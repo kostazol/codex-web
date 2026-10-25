@@ -53,6 +53,12 @@ updates and distinguish active spinners from unread dots. `thread/list` and
 `thread/loaded/list` from a separate app-server do not establish cross-client
 activity. Do not use mass resume or mark-read operations to populate indicators.
 
+Also retain `webview-activity-view.patch` and `src/browser/activity-view.ts`:
+explicit bell/shortcut choices persist per mode in localStorage, then restore
+through native activation once per store. Recheck `RDt`, `zDt`, `c6n` and `VDt`
+when upgrading. Internal cleanup must not overwrite the saved user preference.
+Verify both on and off after reload, plus a fresh visit to the same origin.
+
 Also run `node --test tests/mobile.test.cjs` against each patched tree. Preserve
 the mobile navigation store bridge, navigation/panel hooks and hover guards in
 `webview-mobile.patch`. Rebuild the preload to bundle the matching mobile CSS.
