@@ -1,5 +1,6 @@
 import { installMobileUI } from "./mobile";
 import { adaptBrowserAppHost } from "./app-host-capabilities";
+import { pickBrowserFiles } from "./file-picker";
 import { ResumableWebSocket } from "./resumable-websocket";
 import { restoreActivityView, saveActivityView } from "./activity-view";
 import {
@@ -432,7 +433,8 @@ const themeMediaQuery = matchMedia("(prefers-color-scheme: dark)");
 const mobileMediaQuery = matchMedia("(max-width: 1024px)");
 const initialSidebarState = !mobileMediaQuery.matches;
 const electronShim = (window.__ELECTRON_SHIM__ ??= {});
-electronShim.adaptAppHost = adaptBrowserAppHost;
+electronShim.adaptAppHost = (host) =>
+  adaptBrowserAppHost(host, pickBrowserFiles);
 electronShim.restoreActivityView = restoreActivityView;
 electronShim.saveActivityView = saveActivityView;
 electronShim.subscribeThreadActivity = subscribeThreadActivity;

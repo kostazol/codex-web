@@ -1,4 +1,5 @@
 import { emitRendererEvent, isRecord } from "./shim";
+import { pickBrowserFiles } from "./file-picker";
 
 type CodexFetchMessage = {
   body?: string;
@@ -14,98 +15,6 @@ type PickFilesRequest = {
   imagesOnly?: boolean;
   pickerTitle?: string;
 };
-
-function openBrowserFilePicker({
-  allowMultiple,
-  imagesOnly,
-}: {
-  allowMultiple: boolean;
-  imagesOnly?: boolean;
-}): Promise<File[]> {
-  return new Promise((resolve, reject) => {
-    const input = document.createElement("input");
-    let settled = false;
-
-    function cleanup(): void {
-      input.removeEventListener("cancel", handleCancel);
-      input.removeEventListener("change", handleChange);
-      input.remove();
-    }
-
-    function finish(files: File[]): void {
-      if (settled) {
-        return;
-      }
-      settled = true;
-      cleanup();
-      resolve(files);
-    }
-
-    function fail(error: unknown): void {
-      if (settled) {
-        return;
-      }
-      settled = true;
-      cleanup();
-      reject(error);
-    }
-
-    function handleCancel(): void {
-      finish([]);
-    }
-
-    function handleChange(): void {
-      finish(Array.from(input.files ?? []));
-    }
-
-    input.type = "file";
-    input.multiple = allowMultiple;
-    if (imagesOnly) {
-      input.accept = "image/*";
-    }
-    Object.assign(input.style, {
-      height: "1px",
-      left: "-9999px",
-      opacity: "0",
-      position: "fixed",
-      top: "0",
-      width: "1px",
-    });
-    input.addEventListener("cancel", handleCancel);
-    input.addEventListener("change", handleChange);
-    document.body.append(input);
-
-    try {
-      input.click();
-    } catch (error) {
-      fail(error);
-    }
-  });
-}
-
-async function uploadFiles(files: File[]) {
-  if (files.length === 0) {
-    return [];
-  }
-
-  const uploadUrl = new URL("/__backend/upload", window.location.href);
-  const formData = new FormData();
-
-  for (const file of files) {
-    formData.append("files", file, file.name || "upload");
-  }
-
-  const response = await fetch(uploadUrl, {
-    method: "POST",
-    body: formData,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
-  }
-
-  return (await response.json()).files;
-}
 
 export async function handleLocalFilePickerMessage(message: CodexFetchMessage) {
   try {
@@ -130,12 +39,10 @@ async function handleLocalFilePickerMessageInner(message: CodexFetchMessage) {
   const request = parsePickFilesRequest(message);
   const allowMultiple = message.url === "vscode://codex/pick-files";
 
-  const selectedFiles = await openBrowserFilePicker({
+  const uploadedFiles = await pickBrowserFiles({
     allowMultiple,
     imagesOnly: request.imagesOnly,
   });
-
-  const uploadedFiles = await uploadFiles(selectedFiles);
 
   return allowMultiple
     ? { files: uploadedFiles }

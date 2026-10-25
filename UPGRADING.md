@@ -84,6 +84,17 @@ Verify the native controls on a narrow HTTPS viewport and a real phone separatel
 never force account/workspace gates or enable insecure-origin microphone flags.
 See [dictation validation](docs/dictation.md).
 
+## Browser file attachments
+
+Preserve the AppHost adapter's `fileAttachments.pickFiles` override as well as
+the older IPC picker routes. The current composer invokes the AppHost service
+directly; forwarding it to the server's Electron dialog breaks mobile and PWA
+attachments. Inspect `use-file-picker-*.js` and the descriptor contract when
+upgrading, and run `tests/file-picker.test.cjs` against each prepared tree.
+Opening must remain synchronous with the user's tap. Keep the other native
+attachment services (including SSH transfer) intact. See
+[file attachment behavior and acceptance](docs/file-attachments.md).
+
 ## Safe preparation and publication
 
 1. Keep the running prepared tree and its source revision as the rollback point.
