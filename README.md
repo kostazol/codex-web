@@ -85,7 +85,14 @@ and safe areas. Phone Return inserts a newline; use Send to submit. Desktop
 keyboard behavior remains unchanged. Physical Android/iOS keyboard validation is
 still required in addition to the browser viewport checks.
 
-The mobile layer is maintained separately from the Desktop bundle patches.
+Composer menus open as bottom sheets on phones, with scrollable choices and larger
+targets. The opening tap cannot accidentally select an item beneath it. Desktop's
+model catalog, permission presets, confirmations and menu focus remain authoritative.
+
+The mobile layer is maintained separately from the Desktop bundle patches. Its
+interaction reference is the signature-verified ChatGPT Android 1.2026.293 APK;
+the inspected Codex Remote screens are native Compose, so they are implemented
+explicitly in the web layer rather than extracted as a second HTML bundle.
 See [mobile upstream and Android package workflow](docs/mobile-upstream.md).
 No Android APK or Android source code is bundled in this fork.
 

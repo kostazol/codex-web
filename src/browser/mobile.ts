@@ -67,6 +67,100 @@ export function installMobileUI(closeSidebar: () => void): void {
     });
     media.addEventListener("change", syncDrawer);
     syncDrawer();
+    // Android Remote uses bottom sheets for secondary composer controls. Keep
+    // Desktop's menus (focus, dismissal, permissions and actions) authoritative;
+    // only tag their portal wrappers for the phone layout.
+    const syncSheets = () => {
+      for (const menu of document.querySelectorAll<HTMLElement>(
+        '[role="menu"][aria-labelledby]',
+      )) {
+        const trigger = document.getElementById(
+          menu.getAttribute("aria-labelledby")!,
+        );
+        const wrapper = menu.parentElement;
+        if (!wrapper?.hasAttribute("data-radix-popper-content-wrapper"))
+          continue;
+        const sheet =
+          media.matches &&
+          !!trigger?.closest(
+            '[data-composer-body], [data-codex-web-sheet="true"]',
+          );
+        if (sheet) {
+          menu.dataset.codexWebSheet = "true";
+          wrapper.dataset.codexWebSheetWrapper = "true";
+        } else {
+          delete menu.dataset.codexWebSheet;
+          delete wrapper.dataset.codexWebSheetWrapper;
+        }
+      }
+    };
+    const sheetObserver = new MutationObserver(syncSheets);
+    sheetObserver.observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["aria-labelledby", "data-state"],
+    });
+    media.addEventListener("change", syncSheets);
+    syncSheets();
+    // Radix opens on pointerdown. A bottom sheet can cover that same pointer
+    // before pointerup, so consume the remainder of the opening gesture instead
+    // of accidentally selecting a menu item (especially a permission preset).
+    let openingPointer: number | null = null;
+    let suppressOpeningClick = false;
+    const inSheet = (target: EventTarget | null) =>
+      target instanceof Element &&
+      !!target.closest('[data-codex-web-sheet="true"]');
+    document.addEventListener(
+      "pointerdown",
+      (event) => {
+        suppressOpeningClick = false;
+        const trigger =
+          event.target instanceof Element
+            ? event.target.closest('[aria-haspopup="menu"]')
+            : null;
+        openingPointer =
+          media.matches &&
+          trigger?.closest(
+            '[data-composer-body], [data-codex-web-sheet="true"]',
+          )
+            ? event.pointerId
+            : null;
+      },
+      true,
+    );
+    document.addEventListener(
+      "pointerup",
+      (event) => {
+        if (openingPointer !== event.pointerId) return;
+        openingPointer = null;
+        if (inSheet(event.target)) {
+          suppressOpeningClick = true;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      },
+      true,
+    );
+    document.addEventListener(
+      "click",
+      (event) => {
+        if (suppressOpeningClick && inSheet(event.target)) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+        suppressOpeningClick = false;
+      },
+      true,
+    );
+    document.addEventListener(
+      "pointercancel",
+      () => {
+        openingPointer = null;
+        suppressOpeningClick = false;
+      },
+      true,
+    );
     document.addEventListener("keydown", (event) => {
       if (!media.matches) return;
       if (
