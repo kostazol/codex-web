@@ -66,6 +66,8 @@ test("patched Desktop executes compatibility before every module script", {
 }, () => {
   const html = fs.readFileSync(path.join(process.env.CODEX_WEB_ASAR_DIR, "webview/index.html"), "utf8");
   const scripts = [...html.matchAll(/<script\b[^>]*>/g)].map((match) => match[0]);
-  assert.equal(scripts[0], '<script src="./browser-compat.js">');
+  // Preparation uses Electron-relative paths; the web build roots them so a
+  // /thread/<id> reload fetches the same compatibility script.
+  assert.match(scripts[0], /^<script src="\.?\/browser-compat\.js">$/);
   assert.ok(scripts.some((tag) => tag.includes('type="module"')));
 });

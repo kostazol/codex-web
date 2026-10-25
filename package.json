@@ -4,6 +4,7 @@
   "files": [
     "README.md",
     "scratch/asar/**/*",
+    "scratch-pwa/**/*",
     "src/server/**/*.js",
     "src/server/electron/index.js",
     "!**/*.ts"
@@ -16,6 +17,8 @@
     "launch:unpacked": "NODE_ENV=development electron ./scratch/asar --remote-debugging-port=9222",
     "dev:browser": "vite --config vite.browser.config.ts",
     "build:browser": "vite build --config vite.browser.config.ts",
+    "postbuild:browser": "node scripts/build-pwa.mjs",
+    "build:pwa": "node scripts/build-pwa.mjs",
     "build:server": "cd src/server && tsc",
     "prepare:asar": "./scripts/prepare_asar",
     "preserver": "npm run build:server && npm run build:browser",

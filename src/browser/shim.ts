@@ -1,7 +1,11 @@
 import { installMobileUI } from "./mobile";
+import { ResumableWebSocket } from "./resumable-websocket";
 import { restoreActivityView, saveActivityView } from "./activity-view";
 import { openDictation } from "./dictation";
-import { subscribeThreadActivity, getThreadAttentionState } from "./thread-activity";
+import {
+  subscribeThreadActivity,
+  getThreadAttentionState,
+} from "./thread-activity";
 import {
   getBrowserGateOverride,
   type StatsigGateEvaluation,
@@ -138,8 +142,11 @@ declare global {
 declare const __CODEX_APP_VERSION__: string;
 
 let requestCounter = 0;
-let socket: WebSocket | null = null;
+let socket: ResumableWebSocket | null = null;
 let needsReload = false;
+let hasConnected = false;
+let reloadRequested = false;
+let pageSuspended = false;
 let reconnectTimeoutId: number | null = null;
 const outboundQueue: RendererToMainMessage[] = [];
 const pendingInvokes = new Map<
@@ -231,7 +238,13 @@ function flushOutboundQueue(): void {
 }
 
 function scheduleReconnect(): void {
-  if (reconnectTimeoutId !== null) {
+  if (
+    reloadRequested ||
+    pageSuspended ||
+    reconnectTimeoutId !== null ||
+    document.visibilityState === "hidden" ||
+    navigator.onLine === false
+  ) {
     return;
   }
   reconnectTimeoutId = window.setTimeout(() => {
@@ -240,7 +253,34 @@ function scheduleReconnect(): void {
   }, RECONNECT_DELAY_MS);
 }
 
+function reloadBridgeOnce(): void {
+  if (
+    reloadRequested ||
+    pageSuspended ||
+    document.visibilityState === "hidden" ||
+    navigator.onLine === false
+  )
+    return;
+  // Android can deliver pageshow, online and visibilitychange together.
+  // navigation is asynchronous: latch before requesting it, not on unload.
+  reloadRequested = true;
+  window.location.reload();
+}
+
 function ensureSocket(): void {
+  if (
+    reloadRequested ||
+    pageSuspended ||
+    document.visibilityState === "hidden" ||
+    navigator.onLine === false
+  )
+    return;
+  if (needsReload) {
+    // This view's transferred MessagePorts are gone. Reopening a throwaway
+    // socket first creates a second server view and another initialization.
+    reloadBridgeOnce();
+    return;
+  }
   if (
     socket &&
     (socket.readyState === WebSocket.OPEN ||
@@ -249,21 +289,18 @@ function ensureSocket(): void {
     return;
   }
 
-  socket = new WebSocket(
+  socket = new ResumableWebSocket(
     `${window.location.protocol === "https:" ? "wss:" : "ws:"}//${window.location.host}/__backend/ipc`,
   );
   socket.addEventListener("open", () => {
-    // App-host RPC transfers MessagePorts once at startup. A new connection needs
-    // a fresh app view; replaying requests against the closed ports cannot recover it.
-    if (needsReload) {
-      window.location.reload();
-      return;
-    }
+    hasConnected = true;
     flushOutboundQueue();
   });
   socket.addEventListener("message", (event) => {
     try {
-      const message = JSON.parse(String(event.data)) as MainToRendererMessage;
+      const message = JSON.parse(
+        String((event as MessageEvent).data),
+      ) as MainToRendererMessage;
       handleIncomingMessage(message);
     } catch (error) {
       console.error(
@@ -273,6 +310,12 @@ function ensureSocket(): void {
     }
   });
   socket.addEventListener("close", () => {
+    // An initial failed connection has not sent any RPCs. Keep that queue so
+    // the first successful connection can start without an extra page reload.
+    if (!hasConnected) {
+      scheduleReconnect();
+      return;
+    }
     needsReload = true;
     const error = new Error("Connection to Codex was lost");
     for (const pending of pendingInvokes.values()) pending.reject(error);
@@ -291,6 +334,28 @@ function ensureSocket(): void {
     scheduleReconnect();
   });
 }
+
+function resumeConnection(): void {
+  if (document.visibilityState === "hidden") return;
+  if (reconnectTimeoutId !== null) {
+    window.clearTimeout(reconnectTimeoutId);
+    reconnectTimeoutId = null;
+  }
+  ensureSocket();
+}
+document.addEventListener("visibilitychange", resumeConnection);
+window.addEventListener("online", resumeConnection);
+window.addEventListener("pagehide", () => {
+  pageSuspended = true;
+});
+window.addEventListener("pageshow", (event) => {
+  pageSuspended = false;
+  // Desktop disposes host services on pagehide, even for BFCache. Ordinary
+  // visibility/sleep resumes keep the renderer; history restores need one boot.
+  if ((event as PageTransitionEvent)?.persisted && hasConnected)
+    needsReload = true;
+  resumeConnection();
+});
 
 function enqueueMessage(message: RendererToMainMessage): void {
   outboundQueue.push(message);

@@ -59,9 +59,13 @@ npm.cmd run build:server
 ```
 
 Preparation extracts a copy of the installed Desktop archive and applies the
-Windows variants of the same ordered patches used by the Unix build. It does not modify Desktop's
+Windows variants of the ordered series in `patches/series.json`, also used by
+Unix/Nix. Archive digests, Desktop/CLI versions, and exact patch application are
+checked before use. It does not modify Desktop's
 installation. It refuses to overwrite an existing output directory; preserve
-the old `scratch` directory under another name before preparing again.
+the old `scratch` directory under another name before preparing again. Keep the
+separate `scratch-pwa` release store across upgrades so open clients can still
+load their version. Follow [UPGRADING.md](UPGRADING.md) for candidate validation.
 
 The launcher uses Desktop's bundled CLI and existing Codex sign-in. It starts
 a hidden process on `http://127.0.0.1:8214`; logs and its PID are in
@@ -183,6 +187,9 @@ someone with access to the web ui may be able to:
   - inline images
   - editor sidepanel
   - transcription
+
+Installed PWA startup caching, update behavior and sleep/wake handling are
+documented in [PWA startup and resume](docs/pwa-cache.md).
 
 ## roadmap
 

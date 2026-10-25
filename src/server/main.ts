@@ -19,6 +19,12 @@ import fastifyStatic from "@fastify/static";
 import { installModuleAliasHook } from "./module";
 import { electronNetwork } from "./network";
 import { resolveLocalFile } from "./local-files";
+import {
+  acceptResumableConnections,
+  type BridgeSocket,
+} from "./resumable-socket";
+import { registerPwaRoutes } from "./pwa";
+import { bridgeOriginAllowed } from "./bridge-origin";
 
 type ServerOptions = {
   host: string;
@@ -475,6 +481,14 @@ async function startIpcBridgeServer(options: ServerOptions): Promise<void> {
     prefix: "/",
   });
 
+  registerPwaRoutes(
+    app,
+    path.resolve(
+      process.env.CODEX_WEB_PWA_DIR ??
+        path.join(__dirname, "../../scratch-pwa"),
+    ),
+  );
+
   app.get<{ Params: { "*": string } }>("/@fs/*", async (request, reply) => {
     const file = resolveLocalFile(request.params["*"]);
     if (!file)
@@ -502,6 +516,12 @@ async function startIpcBridgeServer(options: ServerOptions): Promise<void> {
   app.server.on("upgrade", (request, socket, head) => {
     const requestUrl = request.url ?? "/";
     const host = request.headers.host ?? "localhost";
+    if (!bridgeOriginAllowed(request.headers.origin, host)) {
+      socket.end(
+        "HTTP/1.1 403 Forbidden\r\nConnection: close\r\nContent-Length: 0\r\n\r\n",
+      );
+      return;
+    }
     const url = new URL(requestUrl, `http://${host}`);
     if (url.pathname !== "/__backend/ipc") {
       socket.destroy();
@@ -513,7 +533,7 @@ async function startIpcBridgeServer(options: ServerOptions): Promise<void> {
     });
   });
 
-  const rendererSockets = new Map<number, WebSocket>();
+  const rendererSockets = new Map<number, BridgeSocket>();
   const rendererWindowFactory = new Promise<() => Promise<RendererWindow>>(
     (resolve) => {
       bridgeState.setRendererWindowFactory = resolve;
@@ -526,7 +546,7 @@ async function startIpcBridgeServer(options: ServerOptions): Promise<void> {
     }
   };
 
-  websocketServer.on("connection", (socket) => {
+  acceptResumableConnections(websocketServer, (socket) => {
     let rendererWindow: RendererWindow | undefined;
     // Each tab is a real registered app view, with its own IPC client and ownership.
     const rendererReady = rendererWindowFactory
