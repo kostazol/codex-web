@@ -7,6 +7,10 @@
 @media (max-width: 1024px) {
   :root {
     --codex-mobile-header: calc(52px + env(safe-area-inset-top, 0px));
+    --codex-mobile-solid-surface: #fff;
+  }
+  :root[data-theme="dark"] {
+    --codex-mobile-solid-surface: #181818;
   }
   html,
   body,
@@ -47,7 +51,6 @@
     height: 44px;
     border: 0;
     border-radius: 12px;
-    background: var(--color-token-bg-primary, #181818);
     color: var(--color-text-primary, #eee);
     touch-action: manipulation;
     -webkit-app-region: no-drag;
@@ -116,6 +119,11 @@
   [data-codex-web-tool-panel="true"] [data-app-shell-main-titlebar] {
     visibility: hidden;
   }
+  /* inert prevents input, not painting. Keep streaming content out of the
+     navigation screen, including native layers that paint above their parent. */
+  [data-app-shell-sidebar-open="true"] [data-app-shell-active-page] {
+    visibility: hidden !important;
+  }
   [data-app-shell-frame] > [data-app-shell-workspace-row] {
     min-width: 0;
   }
@@ -131,7 +139,7 @@
     margin: 0 !important;
     max-width: 100vw;
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    background: var(--color-token-bg-primary, Canvas);
+    isolation: isolate;
     border-inline-end: 1px solid #8884;
     box-shadow: 8px 0 24px #0003;
   }
@@ -182,7 +190,6 @@
     width: 100% !important;
     height: auto !important;
     z-index: 60 !important;
-    background: var(--color-token-bg-primary, Canvas);
   }
   aside[data-app-shell-focus-area="right-panel"] [data-codex-web-panel-frame] {
     min-width: 0 !important;
@@ -316,7 +323,6 @@
     margin: 0 !important;
     padding: 12px !important;
     border-radius: 20px !important;
-    background: var(--color-token-bg-primary, Canvas) !important;
     box-shadow:
       0 0 0 100vmax #0008,
       0 -8px 32px #0003 !important;
@@ -333,7 +339,6 @@
     border: 0;
     border-bottom: 1px solid #8884;
     margin-bottom: 8px;
-    background: var(--color-token-bg-primary, #181818);
     color: var(--color-text-primary, #eee);
     font: inherit;
     font-weight: 600;
@@ -341,6 +346,37 @@
   [data-codex-web-sheet] [role^="menuitem"] {
     white-space: normal;
     overflow-wrap: anywhere;
+  }
+  /* Desktop surface-under can be translucent. Composite the theme color over
+     an opaque base instead of allowing chat content to show through it. */
+  .app-shell-left-panel,
+  #app-shell-sidebar,
+  aside[data-app-shell-focus-area="right-panel"],
+  [data-codex-web-sheet],
+  [data-codex-web-sheet-close],
+  #codex-web-navigation-toggle {
+    background:
+      linear-gradient(
+        var(--codex-base-surface, var(--codex-mobile-solid-surface)),
+        var(--codex-base-surface, var(--codex-mobile-solid-surface))
+      ),
+      var(--codex-mobile-solid-surface) !important;
+    opacity: 1 !important;
+    backdrop-filter: none !important;
+  }
+  [data-app-shell-sidebar-open="true"]::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: var(--codex-mobile-header);
+    z-index: 74;
+    background:
+      linear-gradient(
+        var(--codex-base-surface, var(--codex-mobile-solid-surface)),
+        var(--codex-base-surface, var(--codex-mobile-solid-surface))
+      ),
+      var(--codex-mobile-solid-surface);
+    pointer-events: none;
   }
   /* Portal submenus must remain reachable even when their parent is a sheet. */
   [data-radix-popper-content-wrapper]:has([role="menu"]) {

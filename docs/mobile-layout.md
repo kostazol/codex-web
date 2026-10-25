@@ -29,6 +29,10 @@ kept a desktop split with almost no room for the conversation.
   space reserved for the tab controls must stay intact to avoid overlapping buttons.
 - Visual viewport height and safe-area insets constrain drawers, sheets and the
   composer. Landscape phones remain in the mobile layout. Pinch zoom is not disabled.
+- Navigation, sheets and tool screens composite their theme color over a solid
+  light/dark base. Desktop's `--color-token-bg-primary` / surface-under is not an
+  opaque-color contract. While Chats is open, the active page is also hidden from
+  painting, not merely made inert; closing restores its visibility and state.
 - Above 1024px, Desktop navigation, hover behavior, anchored menus and pane layouts
   remain native. No account permissions or model selection are changed by resizing.
 
@@ -82,3 +86,10 @@ cache or service worker.
   the running patched source files. All eight Activity/mobile regression tests
   pass on each platform tree. Browser build and mobile TypeScript check pass.
 - macOS and physical Android/iOS runtimes were not launched for this verification.
+- Opacity regression: a controlled page using the real mobile CSS, a transparent
+  Desktop surface-under token and a 25%-opaque theme base reproduced overlapping
+  chat/menu text with the old styles. The corrected styles provide an opaque
+  `rgb(24, 24, 24)` / `rgb(255, 255, 255)` base in dark/light modes and hide the
+  underlying page only while navigation is open.
+  In the real chat, closing navigation restores page visibility and preserves
+  the existing composer draft byte for byte.
