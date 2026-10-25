@@ -108,3 +108,32 @@ All 13 UUID/bootstrap-order, Activity and mobile-navigation tests pass against
 each replay. A real browser on the LAN HTTP origin now reaches the composer and
 project list. This does not establish access from a separate phone or routed
 subnet. Browser features requiring a secure context still require HTTPS.
+
+## Reported browser console warnings (2026-10-25)
+
+- The PWA share target now explicitly declares
+  `application/x-www-form-urlencoded`, matching its existing GET behavior.
+- Desktop eagerly prewarmed dictation cue audio on module initialization.
+  `webview-defer-audio-prewarm` skips that timer in the browser bridge. The first
+  actual cue still creates the context, subsequent cues reuse it, and the idle
+  suspension timer is retained. Native initialization without the bridge is
+  unchanged. This removes that startup audio-device access; it does not repair
+  a failing client audio device or enable HTTP microphone access.
+- The `/` leaf-route warning comes from Desktop's route tree: its parent `_A`
+  renders the view while the leaf has no element. The composer renders despite
+  this warning. No router warnings were globally suppressed.
+- The `workspace_id` warnings are upstream Statsig gate diagnostics. Account
+  identifiers, access gates and their decisions were not replaced or forced.
+- The reported CSP violation is from the external
+  `https://cdn.platform.openai.com/deployments/dil/v14/runner.html`. A fresh public
+  response contained the main inline script matching its permitted SHA-256 hash,
+  and an additional Cloudflare script referencing
+  `/cdn-cgi/challenge-platform/scripts/jsd/main.js` at line 366. That additional
+  script is outside the runner's hash allowlist. The local root response has no
+  such CSP header or meta tag. No remote policy or challenge was bypassed; the
+  warning may remain, and visualization functionality is not validated here.
+
+Both 22-patch platform sets replay with zero fuzz/offsets. All 15 audio startup,
+HTTP compatibility, Activity and mobile navigation tests pass against each set.
+The audio tests verify no browser startup context, lazy context creation/reuse,
+and preservation of native prewarming. Physical audio hardware is not tested.

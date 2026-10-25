@@ -1,0 +1,10 @@
+--- a/webview/assets/app-initial-438d1df57f70.js
++++ b/webview/assets/app-initial-438d1df57f70.js
+@@ -523253,6 +523253,7 @@
+       (j9 = null),
+       (m3s = null),
+       typeof window < `u` &&
++        window.__ELECTRON_SHIM__ == null &&
+         window.setTimeout(() => {
+           try {
+             d3s();
