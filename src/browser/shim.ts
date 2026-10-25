@@ -1,3 +1,4 @@
+import { installMobileUI } from "./mobile";
 import {
   mapBrowserPathToInitialRoute,
   mapMemoryPathToBrowserPath,
@@ -313,15 +314,6 @@ function addIpcListener(channel: string, listener: IpcListener): void {
   rendererListeners.set(channel, listeners);
 }
 
-function shouldCloseSidebarForMemoryPath(path: string): boolean {
-  return (
-    path === "/" ||
-    path.startsWith("/local/") ||
-    path === "/skills" ||
-    path === "/automations"
-  );
-}
-
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
@@ -411,13 +403,10 @@ if (initialRoute.browserPath) {
 }
 
 electronShim.initialSidebarState = initialSidebarState;
+installMobileUI(() => electronShim.closeSidebar?.());
 electronShim.onMemoryNavigationChanged = (navigation) => {
   const path = navigation.location.pathname;
-  if (
-    navigation.action !== "POP" &&
-    mobileMediaQuery.matches &&
-    shouldCloseSidebarForMemoryPath(path)
-  ) {
+  if (navigation.action !== "POP" && mobileMediaQuery.matches) {
     electronShim.closeSidebar?.();
   }
 

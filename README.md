@@ -51,7 +51,7 @@ Run these commands in PowerShell from this checkout:
 
 ```powershell
 npm.cmd ci --ignore-scripts
-npm.cmd rebuild better-sqlite3
+npm.cmd rebuild better-sqlite3 electron
 ./scripts/prepare-windows.ps1
 npm.cmd run build:browser
 npm.cmd run build:server
@@ -71,6 +71,23 @@ a hidden process on `http://127.0.0.1:8214`; logs and its PID are in
 Existing local chats and projects are read from the same Codex profile. No
 one-time history import is needed. Native-only Desktop features are not all
 implemented by the browser bridge.
+
+The Windows launcher uses Electron's Chromium network stack for Desktop account
+requests. This fixes the workspace-settings 403 seen with Node fetch on this
+host. The application still runs on Node, so SQLite keeps the correct ABI.
+`-NetworkTransport node` is available for diagnosis; it may reproduce that 403.
+
+### Phone and tablet browsers
+
+At widths up to 768px, navigation becomes a drawer, the chat uses the full width,
+and controls have larger touch targets. The composer follows the visual viewport
+and safe areas. Phone Return inserts a newline; use Send to submit. Desktop
+keyboard behavior remains unchanged. Physical Android/iOS keyboard validation is
+still required in addition to the browser viewport checks.
+
+The mobile layer is maintained separately from the Desktop bundle patches.
+See [mobile upstream and Android package workflow](docs/mobile-upstream.md).
+No Android APK or Android source code is bundled in this fork.
 
 ### sign in
 
@@ -168,11 +185,7 @@ talk.
 * [davej/pocodex](https://github.com/davej/pocodex) i used this until the wheels fell off. i needed subagents
   and an inline image viewer. this didn't have them and was having a hard time
   keeping up with upstream codex updates.
-* the native codex remote feature (behind a feature flag) is great for
-  connecting to remote codex hosts over ssh to manage long running tasks but
-  this only works if you have codex desktop on your client device. this means it
-  doesn't work on mobile.
-* upcoming first party mobile app from openai. `codex-web` exists and works
-  today. i can't wait for the mobile app but judging by the other openai mobile
-  apps, i'm a little bit skeptical about the quality of the mobile experience.
-  time will tell.
+* [Official mobile Remote connections](https://learn.chatgpt.com/docs/remote-connections)
+  can connect ChatGPT on Android/iOS to a supported Windows or Mac host. This
+  uses OpenAI's pairing and relay infrastructure; it is separate from this
+  self-hosted HTTP browser bridge.

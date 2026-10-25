@@ -48,13 +48,39 @@ were generated independently from actual file diffs.
 
 Nix and native macOS/Linux execution have not been tested on this Windows host.
 
-## Known limitations observed during validation
+## Browser fixes and mobile validation (2026-10-25)
 
-- Some ChatGPT account/settings and Statsig requests return HTTP 403 with
-  `cloudflare_challenge` through the Node HTTP transport. The new-chat composer
-  can display **Couldn't load workspace settings** and disable sending.
-  A complete new-prompt/response test has therefore not passed. No account
-  policy or challenge checks were disabled to hide this failure.
+The original workspace-settings failure below was resolved by using the real
+Electron 41.2.0 Chromium network stack in a hidden helper. The Node host keeps
+its SQLite ABI; authentication headers and Desktop's request allowlist remain
+intact. No access-policy, TLS or challenge checks were disabled. Both a new
+desktop prompt and a phone-width prompt received the requested marker reply.
+
+Also replaced the no-op `net.request` upload implementation, corrected Windows
+absolute-file routing, and preserved file extensions for browser uploads.
+Eight local network tests pass, including binary bodies, streaming, cancellation,
+redirect/error semantics, concurrent requests and ClientRequest uploads. The
+running HTTP server passed an upload/read round trip and invalid-path checks.
+
+The mobile layer adds a compact header, navigation drawer/backdrop, safe areas,
+visual-viewport sizing and larger touch controls. The ProseMirror patch handles
+phone Return inside its existing keymap, preserving editor undo and multiline
+semantics. Browser checks cover 320px, 390px and 768px widths, project selection,
+the model menu, summary popover and successful Send. Physical phone keyboards
+and native Android/iOS rendering have not been tested.
+
+There are now 20 ordered patches per platform. The Windows and Mac sets were
+replayed from the unmodified formatted bundles with zero fuzz; Windows results
+match the runtime files byte for byte. Native macOS/Linux remain untested.
+
+## Remaining limitations observed during validation
+
+- Node-only network mode can still reproduce the workspace-settings 403;
+  the Windows launcher now defaults to Electron mode. Browser-side Statsig
+  telemetry can still time out and use its existing fallback.
+- The account's cloud `/automations` listing returns HTTP 404. This is not
+  converted into fake successful data. Local chat sending/history work despite
+  this unavailable endpoint.
 - The embedded Windows updater is unavailable, and the native Codex app-tools
   integration reports `missing-plugin`. Updating the pinned sources is manual;
   native Desktop integrations must not be assumed to work in the web wrapper.

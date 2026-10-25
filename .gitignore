@@ -1,6 +1,9 @@
 node_modules/
 scratch*/
 scratch-*.mjs
+scratch-before
+scratch-after
+__pycache__/
 .codex-tpp-local-executor-installation-id
 browser-sidebar-page-states.json
 statsig-state.json

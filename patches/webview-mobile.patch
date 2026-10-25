@@ -1,0 +1,29 @@
+--- a/webview/index.html
++++ b/webview/index.html
+@@ -6,7 +6,7 @@
+     <base href="/" />
+     <script type="module" src="./assets/preload.js"></script>
+     <meta charset="UTF-8" />
+-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+     <title>ChatGPT</title>
+     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+     <link rel="manifest" href="/manifest.json" />
+@@ -165,6 +165,7 @@
+       crossorigin
+       href="./assets/app-shared-bd3e4e649b69.css"
+     />
++    <link rel="stylesheet" href="/mobile.css" />
+   </head>
+   <body tabindex="0" style="outline: none">
+     <div id="root">
+--- a/webview/assets/app-primary-7d7313419f84.js
++++ b/webview/assets/app-primary-7d7313419f84.js
+@@ -35169,6 +35169,7 @@
+     ? ((kt = ie
+         ? (0, zP.jsxs)(`div`, {
+             className: NP.ApplicationMenuTopBar,
++            "data-codex-web-menubar": !0,
+             children: [
+               (0, zP.jsx)(Ykt, { hideUnreadBadge: V }),
+               (0, zP.jsx)(kCt, {}),

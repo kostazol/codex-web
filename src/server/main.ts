@@ -17,6 +17,8 @@ import Fastify from "fastify";
 import fastifyMultipart from "@fastify/multipart";
 import fastifyStatic from "@fastify/static";
 import { installModuleAliasHook } from "./module";
+import { electronNetwork } from "./network";
+import { resolveLocalFile } from "./local-files";
 
 type ServerOptions = {
   host: string;
@@ -447,7 +449,12 @@ async function startIpcBridgeServer(options: ServerOptions): Promise<void> {
         for await (const part of request.files()) {
           const label = part.filename?.trim() || "upload";
 
-          const uploadedPath = path.join(uploadRoot, randomUUID());
+          const extension = path.extname(label);
+          const uploadedPath = path.join(
+            uploadRoot,
+            randomUUID() +
+              (/^\.[a-z0-9]{1,16}$/i.test(extension) ? extension : ""),
+          );
 
           await fs.writeFile(uploadedPath, await part.toBuffer());
 
@@ -464,14 +471,17 @@ async function startIpcBridgeServer(options: ServerOptions): Promise<void> {
   });
 
   await app.register(fastifyStatic, {
-    root: "/",
-    prefix: "/@fs/",
-    decorateReply: false,
-  });
-
-  await app.register(fastifyStatic, {
     root: path.resolve(__dirname, "../../scratch/asar/webview"),
     prefix: "/",
+  });
+
+  app.get<{ Params: { "*": string } }>("/@fs/*", async (request, reply) => {
+    const file = resolveLocalFile(request.params["*"]);
+    if (!file)
+      return reply
+        .code(400)
+        .send({ error: "Expected an absolute local file path" });
+    return reply.sendFile(path.basename(file), path.dirname(file));
   });
 
   app.get("/", async (_request, reply) => {
@@ -718,7 +728,8 @@ async function startIpcBridgeServer(options: ServerOptions): Promise<void> {
 
 async function main(args: string[]) {
   const options = parseServerArgs(args);
-
+  if (process.env.CODEX_WEB_NETWORK_TRANSPORT === "electron")
+    await electronNetwork.start();
   await startIpcBridgeServer(options);
 }
 

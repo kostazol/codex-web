@@ -1,11 +1,16 @@
 param(
     [string]$ListenAddress = '127.0.0.1',
     [ValidateRange(1,65535)][int]$Port = 8214,
-    [string]$CodexCliPath
+    [string]$CodexCliPath,
+    [ValidateSet('electron','node')][string]$NetworkTransport = 'electron'
 )
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $main = Join-Path $repoRoot 'src/server/main.js'
+$env:CODEX_WEB_NETWORK_TRANSPORT = $NetworkTransport
+if ($NetworkTransport -eq 'electron' -and -not (Test-Path -LiteralPath (Join-Path $repoRoot 'node_modules/electron/dist/electron.exe'))) {
+    throw 'Install the Electron network runtime with: npm.cmd rebuild electron'
+}
 if (-not (Test-Path -LiteralPath $main)) { throw 'Run npm run build:server and npm run build:browser first.' }
 if (-not $CodexCliPath) {
     $desktop = Get-AppxPackage -Name OpenAI.Codex | Sort-Object Version -Descending | Select-Object -First 1

@@ -1,3 +1,6 @@
+import { networkFetch } from "../network";
+import { networkRequest } from "../network-request";
+
 type StubFunction = (...args: unknown[]) => unknown;
 type StubListener = (...args: unknown[]) => void;
 type StubMessagePort = {
@@ -794,35 +797,9 @@ const net = {
     return true;
   },
   async fetch(input: string | URL, init?: RequestInit): Promise<Response> {
-    // log("net.fetch", [input, init]);
-    if (typeof globalThis.fetch === "function") {
-      return globalThis.fetch(input as URL | RequestInfo, init);
-    }
-    return new Response("", { status: 204 });
+    return networkFetch(input, init);
   },
-  request(...args: unknown[]): {
-    getHeader: (name: string) => string | undefined;
-    once: (event: string, listener: StubListener) => unknown;
-    setHeader: (name: string, value: string) => void;
-  } {
-    // log("net.request", args);
-    const headers = new Map<string, string>();
-    const request = {
-      setHeader(name: string, value: string): void {
-        // log("net.request.setHeader", [name, value]);
-        headers.set(name.toLowerCase(), value);
-      },
-      getHeader(name: string): string | undefined {
-        // log("net.request.getHeader", [name]);
-        return headers.get(name.toLowerCase());
-      },
-      once(event: string, listener: StubListener): unknown {
-        // log("net.request.once", [event, listener]);
-        return request;
-      },
-    };
-    return request;
-  },
+  request: networkRequest,
 };
 
 const autoUpdater = createEmitterStub("autoUpdater");

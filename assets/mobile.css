@@ -1,0 +1,194 @@
+/* Stable Desktop data attributes: keep hashed bundle classes out of browser patches. */
+#codex-web-drawer-backdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --codex-mobile-header: calc(52px + env(safe-area-inset-top, 0px));
+  }
+  html,
+  body,
+  #root {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+  [data-app-shell-frame] {
+    --app-shell-navigation-rail-width: 0px !important;
+    --app-shell-left-panel-width: 0px !important;
+    --app-shell-application-menu-height: 0px !important;
+    --app-shell-titlebar-height: var(--codex-mobile-header) !important;
+    --app-shell-titlebar-top-inset: 0px !important;
+    width: 100% !important;
+    height: var(--codex-web-viewport-height, 100dvh) !important;
+    position: fixed !important;
+    inset: var(--codex-web-viewport-top, 0px) 0 auto !important;
+    margin: 0 !important;
+    zoom: 1 !important;
+  }
+  [data-codex-web-menubar] {
+    position: absolute !important;
+    z-index: 80 !important;
+    inset: env(safe-area-inset-top, 0px) auto auto
+      env(safe-area-inset-left, 0px);
+    width: 52px !important;
+    height: 52px !important;
+    padding: 4px !important;
+    background: transparent !important;
+    -webkit-app-region: no-drag;
+  }
+  [data-codex-web-menubar] [role="menubar"],
+  [data-codex-web-menubar] button:not([data-app-shell-sidebar-trigger]) {
+    display: none !important;
+  }
+  [data-app-shell-sidebar-trigger] {
+    width: 44px !important;
+    height: 44px !important;
+    margin: 0 !important;
+  }
+  [data-app-shell-main-titlebar] {
+    height: var(--codex-mobile-header) !important;
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    padding-inline-start: calc(
+      52px + env(safe-area-inset-left, 0px)
+    ) !important;
+    padding-inline-end: env(safe-area-inset-right, 0px) !important;
+  }
+  [data-app-shell-titlebar] {
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 !important;
+  }
+  [data-app-shell-titlebar] button[aria-label="New chat"] {
+    display: none !important;
+  }
+  [data-app-shell-titlebar] button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  [data-app-shell-frame] > [data-app-shell-workspace-row] {
+    min-width: 0;
+  }
+  [data-app-shell-sidebar-open="false"] .app-shell-left-panel {
+    display: none !important;
+  }
+  [data-app-shell-sidebar-open="true"] .app-shell-left-panel {
+    display: flex !important;
+    position: fixed !important;
+    z-index: 75 !important;
+    inset: var(--codex-mobile-header) auto 0 0 !important;
+    width: min(360px, calc(100vw - 32px)) !important;
+    margin: 0 !important;
+    max-width: calc(100vw - 32px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: var(--color-token-bg-primary, Canvas);
+    border-inline-end: 1px solid #8884;
+    box-shadow: 8px 0 24px #0003;
+  }
+  [data-app-shell-sidebar-open="true"] #app-shell-sidebar {
+    width: 100% !important;
+  }
+  .app-shell-left-panel > div > div:has(> #app-shell-sidebar) {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  #app-shell-sidebar > div {
+    width: 100% !important;
+  }
+  #app-shell-sidebar > div > div {
+    flex: 1;
+    min-width: 0;
+    width: auto !important;
+  }
+  #app-shell-sidebar nav {
+    padding-inline: 4px;
+  }
+  #app-shell-sidebar nav button {
+    min-width: 44px;
+  }
+  body:has([data-app-shell-sidebar-open="true"]) #codex-web-drawer-backdrop {
+    display: block;
+    position: fixed;
+    z-index: 70;
+    inset: calc(var(--codex-web-viewport-top, 0px) + var(--codex-mobile-header))
+      0 auto;
+    height: calc(
+      var(--codex-web-viewport-height, 100dvh) - var(--codex-mobile-header)
+    );
+    width: 100%;
+    border: 0;
+    background: #0007;
+    touch-action: manipulation;
+  }
+  [data-app-shell-main-surface],
+  [data-app-shell-main-content-layout] {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  [data-app-shell-main-content-layout] {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  [data-composer-body] {
+    padding: 10px !important;
+  }
+  [data-composer-body] [contenteditable="true"],
+  input,
+  textarea {
+    font-size: 16px !important;
+  }
+  [data-composer-body] [contenteditable="true"] {
+    min-height: 44px;
+    overflow-wrap: anywhere;
+  }
+  [data-composer-footer-responsive] {
+    column-gap: 4px !important;
+  }
+  [data-composer-footer-responsive] > :last-child {
+    max-width: 100%;
+  }
+  [data-composer-body] button,
+  [data-app-shell-main-titlebar] button,
+  #app-shell-sidebar button,
+  #app-shell-sidebar [role="button"],
+  [role="menuitem"],
+  [role="option"] {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+  [data-composer-body] button:has(svg),
+  [data-app-shell-main-titlebar] button:has(svg) {
+    min-width: 44px;
+  }
+  [role="dialog"] {
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(
+      var(--codex-web-viewport-height, 100dvh) - 16px
+    ) !important;
+  }
+  [role="menu"],
+  [role="listbox"] {
+    max-width: calc(100vw - 16px);
+    max-height: calc(var(--codex-web-viewport-height, 100dvh) - 80px);
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+  pre,
+  table {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  pre {
+    -webkit-overflow-scrolling: touch;
+  }
+  [data-app-shell-main-content-layout] {
+    overflow-x: clip;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-app-shell-frame] {
+    scroll-behavior: auto;
+  }
+}
