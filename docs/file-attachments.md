@@ -63,6 +63,8 @@ full prepared Desktop tree, including all 9 attachment checks; the two adapter
 modules passed TypeScript checking. The real HTTPS composer at 360 x 800 opened
 the browser file chooser and displayed a text file and PNG together. Those test
 attachments were removed without sending a message. HTTP/HTTPS release integrity
-and WebSocket reconnect probes also passed. This is not a physical Samsung or
-macOS runtime acceptance result; the stored macOS patch baseline contains only
-patch target files and cannot supply the separate native picker chunk test.
+and WebSocket reconnect probes also passed. The user subsequently confirmed that
+the file chooser opens and a file is added in the installed Samsung PWA. This
+does not establish macOS runtime acceptance; the stored macOS patch baseline
+contains only patch target files and cannot supply the separate native picker
+chunk test.

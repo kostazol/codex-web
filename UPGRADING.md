@@ -43,6 +43,12 @@ the upstream contract checks are explicitly skipped. Follow with browser checks:
 bell, live Priority/recents, filter persistence, opening a chat, and mobile drawer.
 See [Activity evidence and behavior](docs/activity.md).
 
+The replay verifier copies only patch target files. It is sufficient for patch
+application and tests that read those files, but is not a complete application
+tree. For the full test suite, use a fully extracted, prepared and built tree:
+the attachment test also needs the unmodified `use-file-picker-*.js` chunk.
+Missing chunks are failures, not a reason to disable their contract tests.
+
 Preserve `webview-thread-activity.patch` and `src/browser/thread-activity.ts`.
 Recheck the native list subscription RPC lifetime (`Yw.subscribe`), follower
 retention/disposal, catalog attention selector (`oMi`) and Activity recency cache
@@ -156,3 +162,5 @@ is preferable to silently publishing partly applied patches.
 
 See [the architecture review](docs/architecture-review-2026-10-25.md) and
 [PWA release behavior](docs/pwa-cache.md) for the validated boundaries.
+The [2026-10-26 publication check](docs/publication-review-2026-10-26.md) maps the
+latest fixes to their patches, maintained adapters and regression tests.

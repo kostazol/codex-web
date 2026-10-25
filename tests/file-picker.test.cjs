@@ -197,7 +197,7 @@ test("AppHost picker is local while remote attachment operations and original ho
 });
 
 test(
-  "pinned Desktop file-picker hook reaches browser input synchronously and receives native descriptors",
+  "patched AppHost installation routes the native picker to browser input synchronously",
   {
     skip: !process.env.CODEX_WEB_ASAR_DIR,
   },
@@ -214,18 +214,35 @@ test(
     const hook = source.match(/function l\(\)\{[\s\S]+?(?=var u;)/)?.[0];
     assert.ok(hook, "Review the pinned native hook when upgrading");
     const p = picker();
-    const host = adaptBrowserAppHost(
-      {
+    const sharedFile = fs
+      .readdirSync(assets)
+      .find((file) => /^app-shared-.*\.js$/.test(file));
+    assert.ok(sharedFile, "Review the native AppHost installation on upgrade");
+    const shared = fs.readFileSync(path.join(assets, sharedFile), "utf8");
+    const installation = shared.match(
+      /function gSt\(e\) \{[\s\S]+?(?=var _St, f\$;)/,
+    )?.[0];
+    assert.ok(
+      installation,
+      "Review the native AppHost installation on upgrade",
+    );
+    const installScope = {
+      host: {
         fileAttachments: {
           pickFiles: () => {
             throw Error("Server picker");
           },
         },
       },
-      p.pickBrowserFiles,
-    );
+      window: {
+        __ELECTRON_SHIM__: {
+          adaptAppHost: (host) => adaptBrowserAppHost(host, p.pickBrowserFiles),
+        },
+      },
+    };
+    vm.runInNewContext(installation + "; gSt(host);", installScope);
     const context = {
-      n: host,
+      n: installScope.f$,
       u: { c: () => [] },
       a: () => ({ formatMessage: (message) => message.defaultMessage }),
       s: (accept) => accept,

@@ -11,9 +11,10 @@ future Desktop version or native macOS/Linux runtime acceptance.
   ordering. The fork's patches add narrow integration hooks. Mobile layout,
   PWA lifecycle and reconnect behavior live in maintained source
   modules rather than ad-hoc modifications to extracted bundles.
-  Dictation now uses the original Desktop browser fallback without an adapter;
+  Dictation now uses the original Desktop browser capture and transcription,
+  with an AppHost capability adapter that keeps device access in the browser;
   see [the subsequent dictation change](dictation.md). Patch counts below describe
-  the review before that adapter was removed.
+  this historical review, before the later AppHost and composer changes.
 - `patches/series.json` owns the ordered Windows/macOS patch series, Desktop/CLI
   versions and original archive digests. Production preparation and replay use the
   same applicator. Any offset/fuzz is a failure in a disposable candidate tree.
