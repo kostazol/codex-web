@@ -1,7 +1,6 @@
 import { installMobileUI } from "./mobile";
 import { ResumableWebSocket } from "./resumable-websocket";
 import { restoreActivityView, saveActivityView } from "./activity-view";
-import { openDictation } from "./dictation";
 import {
   subscribeThreadActivity,
   getThreadAttentionState,
@@ -116,7 +115,6 @@ type MemoryNavigationChange = {
 type ElectronShimState = {
   restoreActivityView?: typeof restoreActivityView;
   saveActivityView?: typeof saveActivityView;
-  openDictation?: typeof openDictation;
   subscribeThreadActivity?: typeof subscribeThreadActivity;
   getThreadAttentionState?: typeof getThreadAttentionState;
   initialRoute?: string;
@@ -434,7 +432,6 @@ const initialSidebarState = !mobileMediaQuery.matches;
 const electronShim = (window.__ELECTRON_SHIM__ ??= {});
 electronShim.restoreActivityView = restoreActivityView;
 electronShim.saveActivityView = saveActivityView;
-electronShim.openDictation = openDictation;
 electronShim.subscribeThreadActivity = subscribeThreadActivity;
 electronShim.getThreadAttentionState = getThreadAttentionState;
 const buildFlavor: "prod" | "dev" | "agent" | string = "prod";

@@ -26,7 +26,6 @@
     "webview-browser-compat.patch",
     "webview-defer-audio-prewarm.patch",
     "webview-thread-activity.patch",
-    "webview-dictation.patch",
     "webview-activity-view.patch",
     "webview-root-urls.patch"
   ],

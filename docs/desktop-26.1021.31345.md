@@ -149,9 +149,9 @@ against each. The running Windows assets match the verified patch output.
 
 ## Browser dictation (2026-10-25)
 
-The 24th patch adds a browser recording/file dialog with native authenticated
-transcription and insertion into the draft. LAN HTTP supports selecting a recorded
-audio file; direct microphone capture requires HTTPS or localhost. Account gates
-remain native. A synthetic WAV was successfully transcribed through the running
-LAN instance without sending a chat message. All 41 targeted checks pass for each
-platform; see [dictation behavior and validation limits](dictation.md).
+The first adaptation added a separate recording/file dialog for LAN HTTP. It has
+since been removed at the user's request: the pinned Desktop already contains a
+browser microphone fallback and the desired in-composer recording UI. Dictation
+now runs unchanged from upstream on HTTPS/localhost. Account gates remain native.
+The current ordered series has 25 patches; see
+[dictation behavior and validation limits](dictation.md).

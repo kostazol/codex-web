@@ -67,14 +67,16 @@ repeated drawer dismissal, narrow/landscape screens and Desktop fallback.
 
 ## Browser dictation
 
-For browser dictation, preserve `webview-dictation.patch`,
-`src/browser/dictation.ts` and `assets/dictation.css`. Recheck the native Codex
-availability policy (`iBt`), recording entry (`CKs`), authenticated multipart
-transcription (`dmo`) and insert-only callback contract. Run
-`node --test tests/dictation.test.cjs` against both patched trees. Verify HTTP file
-transcription and the HTTPS/localhost microphone capability separately; never
-force account/workspace gates or enable insecure-origin microphone flags. See
-[dictation validation](docs/dictation.md).
+Dictation uses the original Desktop composer and browser capture fallback. Do not
+reintroduce the former `openDictation` interception or file-upload dialog. Recheck
+the native availability policy (`iBt`), recording entry (`CKs`), capture owner
+(`Z0a`), device selection and authenticated multipart transcription (`dmo`). Run
+`node --test tests/dictation.test.cjs` with `CODEX_WEB_ASAR_DIR` and the matching
+clean `CODEX_WEB_BASELINE_DIR` against both patched trees. This checks that the
+recording hook remains identical to upstream, plus capture/permission cleanup.
+Verify the native controls on a narrow HTTPS viewport and a real phone separately;
+never force account/workspace gates or enable insecure-origin microphone flags.
+See [dictation validation](docs/dictation.md).
 
 ## Safe preparation and publication
 

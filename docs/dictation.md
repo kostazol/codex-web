@@ -1,66 +1,65 @@
-# Browser dictation
+# Desktop dictation in the browser
 
-Added for Desktop 26.1021.31345 on 2026-10-25.
+Updated for Desktop 26.1021.31345 on 2026-10-25.
 
-The composer's Dictate button opens a touch-friendly dialog with recording,
-audio-file selection, playback, download, cancellation and explicit transcription.
-The transcript is inserted into the original composer draft, never sent as a chat
-message. Existing draft text uses Desktop's native insertion behavior.
+The microphone button runs Desktop's original recording UI inside the composer:
+waveform, cancellation, confirmation, transcription progress, errors and retry.
+Confirming dictation inserts its transcript into the draft using Desktop's native
+callback. The browser uses the microphone of the phone or computer on which the
+page is open. The former recording/file-picker dialog has been removed.
 
-## HTTP and microphone access
+## Access and lifetime
 
-On LAN HTTP (`http://192.168...`) browsers do not expose `getUserMedia`. Recording
-is disabled with an explanation, while uploading an existing recorder file works.
-On HTTPS with a trusted certificate, or localhost on the server PC, the Record
-button requests microphone access only after the user presses it. No browser
-security setting, certificate check or permission prompt is bypassed.
+Recording requires a trusted HTTPS origin or localhost, the browser's microphone
+permission, and Desktop's normal account/workspace availability checks. On LAN
+HTTP, the browser cannot provide microphone capture. There is no file-upload
+fallback and no insecure-origin or account-gate bypass.
 
-See [MDN's secure-context requirements](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#privacy_and_security).
-OpenAI distinguishes [dictation from a live voice conversation](https://developers.openai.com/training/walkthroughs/using-voice).
-This change implements dictation, not a realtime voice conversation.
+The bundled `CKs` hook, `Z0a` capture owner, device selection and `dmo`
+authenticated transcription remain unchanged from the pinned Desktop archive.
+The Electron-only capture API is absent from the browser preload, so upstream
+uses `getUserMedia` and `MediaRecorder`. A saved Desktop microphone device ID
+falls back to an available browser microphone when that device is unavailable.
 
-## Integration and lifetime
+Native code owns track release, pending-permission cancellation, recorder state,
+transcription, error handling and the recording time limit (595 seconds in this
+release). No audio file picker, download control, custom transcription endpoint
+or separate dialog is installed by this fork. Existing Desktop transcription
+sends audio through the authenticated OpenAI transport; this change does not add
+recordings to the PWA asset cache or persist them on the local server.
 
-`webview-dictation.patch` in both platform series replaces only the hardware check
-in the Codex dictation access policy when the browser dialog is installed. Native
-account, workspace, inference-provider, configuration and rollout checks still
-apply. It does not force access gates or modify credentials.
+## Upgrade contract
 
-The patched `CKs` recording entry calls `src/browser/dictation.ts` after native
-availability/busy checks. The dialog delegates to Desktop's `dmo` multipart
-`/transcribe` implementation, using the current authenticated desktop transport.
-It calls `onTranscriptInsert`, not `onTranscriptSend`. It checks component lifetime,
-current account/user and the original insertion callback before upload and again
-before inserting a response. The modal closes on navigation, account/composer
-change or explicit cancellation; late results cannot populate another draft.
-
-Audio stays in browser memory until the user selects Transcribe or Save. The
-dialog does not save recordings on the server or add audio attachments to chats.
-Transcribe explicitly sends the audio to OpenAI. Failure retains the current
-browser preview for retry or download. Closing releases object URLs, timers and
-microphone tracks; cancellation also aborts an outstanding transcription request.
-
-Limits: 20 MiB per file, five-minute browser recordings and a 90-second
-transcription timeout. The file selector accepts WAV, MP3, M4A/MP4, WebM, OGG and
-FLAC. Missing/generic file MIME types are normalized from recognized extensions;
-actual codec support still depends on the browser and transcription service.
+`patches/series.json` contains no dictation override. Neither platform applies the
+former `webview-dictation.patch`, and the preload exposes no `openDictation` hook.
+Preserve this boundary when upgrading: inspect upstream browser support before
+adding any compatibility adapter. Do not copy minified symbol names across
+releases without reviewing the changed source.
 
 ## Validation
 
-- Real LAN HTTP browser: generated a short synthetic WAV locally, selected it,
-  transcribed through the existing account, and observed the expected English
-  sentence in the composer. No chat message was sent. The test draft was cleared.
-- Localhost browser: recording button enabled; LAN HTTP: disabled with file
-  fallback. Real microphone capture was not started during automated validation.
-- Dialog layout checked at 360x800 and 320x640. Buttons are at least 44px high;
-  narrow viewports can scroll the dialog. This is browser viewport testing, not
-  physical Samsung testing.
-- Fifteen dictation checks cover validation/MIME, explicit upload, cancellation,
-  late responses, account/composer changes, service retry, empty transcripts,
-  microphone denial, late permission, recording time limit, track release,
-  timeout and retained native availability gates. Recording uses a test double.
-- All 41 targeted tests pass against each platform's clean patched tree. Both
-  24-patch series replay with zero fuzz/offsets; Windows files match the running
-  installation. macOS runtime and phone HTTPS capture remain unverified.
+- Both platform patch series replay cleanly: 25 patches, 10 files, no offsets or
+  fuzz. The native recording hook is byte-identical to each untouched baseline.
+- Six tests run the shipped availability/device/capture code with a fake
+  microphone. They cover native gates, cancellation and ownership release,
+  unavailable Desktop devices, permission denial and late permission resolution.
+- Physical phone capture and speech recognition require device acceptance; fake
+  media tests do not establish microphone quality or transcription accuracy.
 
-Generated audio and screenshots are ignored local validation artifacts.
+See [upgrade checks](../UPGRADING.md#browser-dictation). Browser UI and regression
+results for this change are recorded after deployment below.
+
+## Deployed verification
+
+- The published Windows assets match all 10 files from the clean 25-patch replay;
+  the generated preload contains no custom dictation hook.
+- The full Node suite passed: 70 tests, zero failures/skips. All six native
+  dictation tests also passed against the macOS replay with its clean baseline.
+- HTTPS at `web-codex.duckdns.org` served PWA release
+  `6297922addf24d9223cc419b`. A fresh browser document adopted that release with
+  its cache ready. Both HTTP and HTTPS bridge resume/integrity probes passed.
+- At 360x800, Dictate entered the original inline pending-permission state, with
+  no upload dialog. Cancel restored Dictate and the empty draft; a second start
+  and cancel also worked. The in-app browser did not grant microphone access, so
+  waveform rendering during capture and live speech recognition were not tested
+  there. No ambient audio was transcribed or chat message sent.

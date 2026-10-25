@@ -80,10 +80,11 @@ The sidebar's Activity bell is preserved, including Priority, newest-first recen
 chats and the Pinned/Scheduled filters. Its UI and sorting are the original Desktop
 implementation; see [Activity compatibility and validation](docs/activity.md).
 
-The Dictate button supports recording, selecting an audio file, playback and
-download, then transcription into the draft through the current Codex account.
-Microphone capture requires HTTPS or localhost; LAN HTTP supports audio-file
-selection. See [browser dictation and validation](docs/dictation.md).
+The Dictate button uses Desktop's original in-composer recording, waveform,
+cancel/confirm controls and authenticated transcription into the draft. It uses
+the microphone of the device running the browser. HTTPS or localhost and browser
+microphone permission are required; there is no separate file-upload dialog.
+See [browser dictation and validation](docs/dictation.md).
 
 Phones and tablets use explicit open/close navigation, dismissible menu sheets
 and full-width tool screens with a return-to-chat action. See the
@@ -214,10 +215,10 @@ talk.
 
 ## alternatives
 
-* [davej/pocodex](https://github.com/davej/pocodex) i used this until the wheels fell off. i needed subagents
+- [davej/pocodex](https://github.com/davej/pocodex) i used this until the wheels fell off. i needed subagents
   and an inline image viewer. this didn't have them and was having a hard time
   keeping up with upstream codex updates.
-* [Official mobile Remote connections](https://learn.chatgpt.com/docs/remote-connections)
+- [Official mobile Remote connections](https://learn.chatgpt.com/docs/remote-connections)
   can connect ChatGPT on Android/iOS to a supported Windows or Mac host. This
   uses OpenAI's pairing and relay infrastructure; it is separate from this
   self-hosted HTTP browser bridge.

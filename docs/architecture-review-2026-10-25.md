@@ -9,8 +9,11 @@ future Desktop version or native macOS/Linux runtime acceptance.
 
 - Desktop owns conversation state, account permissions, models and native Activity
   ordering. The fork's patches add narrow integration hooks. Mobile layout,
-  dictation adapters, PWA lifecycle and reconnect behavior live in maintained source
+  PWA lifecycle and reconnect behavior live in maintained source
   modules rather than ad-hoc modifications to extracted bundles.
+  Dictation now uses the original Desktop browser fallback without an adapter;
+  see [the subsequent dictation change](dictation.md). Patch counts below describe
+  the review before that adapter was removed.
 - `patches/series.json` owns the ordered Windows/macOS patch series, Desktop/CLI
   versions and original archive digests. Production preparation and replay use the
   same applicator. Any offset/fuzz is a failure in a disposable candidate tree.
