@@ -64,6 +64,9 @@ the mobile navigation store bridge, navigation/panel hooks and hover guards in
 `webview-mobile.patch`. Rebuild the preload to bundle the matching mobile CSS.
 Use the [mobile acceptance checks](docs/mobile-layout.md), including tool tabs,
 repeated drawer dismissal, narrow/landscape screens and Desktop fallback.
+For the mobile composer, review the explicit slot attributes and model label
+patch, then check input-to-control focus transfer: no button may move between
+pointer down and click. See [OpenChamber comparison and acceptance](docs/openchamber-mobile.md).
 
 ## Browser dictation
 

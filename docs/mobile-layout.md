@@ -1,5 +1,10 @@
 # Mobile interaction contract
 
+The 2026-10-26 composer update follows the [OpenChamber source review](openchamber-mobile.md):
+compact reading layout, expansion of the same editor on focus, and a separate
+model/permissions row. `webview-mobile-composer.patch` and the bundled
+`assets/mobile-composer.css` extend the layout below without replacing chat state.
+
 Updated 2026-10-25 for Desktop 26.1021.31345 following the Samsung S20 report.
 
 The earlier adaptation retained too much Desktop behavior: its navigation CSS

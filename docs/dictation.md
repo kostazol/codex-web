@@ -72,6 +72,9 @@ that device boundary without changing native `CKs` recording logic.
   The embedded browser does not complete microphone acquisition, so physical
   Samsung capture/transcription is still a device acceptance check.
 - HTTP/HTTPS bridge resume and immutable PWA integrity probes pass.
+- The user subsequently confirmed on Samsung that recording starts and the
+  separate Send arrow stays visible. This confirms capture UI startup, not the
+  accuracy of a completed transcription.
 
 ### Earlier verification (superseded for microphone startup)
 

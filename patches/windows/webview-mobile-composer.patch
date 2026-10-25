@@ -1,0 +1,68 @@
+--- a/webview/assets/app-initial-438d1df57f70.js
++++ b/webview/assets/app-initial-438d1df57f70.js
+@@ -199582,6 +199582,7 @@ function Y4n(e) {
+         et.div,
+         {
+           className: fe,
++          "data-codex-web-composer-slot": `leading`,
+           layout: se,
+           layoutId: pe,
+           layoutDependency: ce,
+@@ -199675,6 +199676,7 @@ function Y4n(e) {
+   t[74] !== Ie
+     ? ((Le = (0, Kj.jsx)(et.div, {
+         className: Se,
++        "data-codex-web-composer-slot": `input`,
+         layout: Ce,
+         inert: T,
+         "aria-hidden": we,
+@@ -199731,6 +199733,7 @@ function Y4n(e) {
+         et.div,
+         {
+           className: We,
++          "data-codex-web-composer-slot": `trailing`,
+           layout: Ge,
+           layoutId: Ke,
+           layoutDependency: ce,
+@@ -200327,6 +200330,7 @@ function n3n(e) {
+       ? ((y = (0, Kj.jsx)(`div`, {
+           ref: s,
+           className: g,
++          "data-codex-web-composer": `adaptive`,
+           "data-dictation-view": i,
+           "data-dictation-enabled": _,
+           "data-composer-footer-responsive": v,
+@@ -200384,7 +200388,7 @@ function a3n(e) {
+   let s;
+   return (
+     t[2] !== n || t[3] !== r || t[4] !== o
+-      ? ((s = (0, Kj.jsx)(`div`, { ref: r, className: o, children: n })),
++      ? ((s = (0, Kj.jsx)(`div`, { ref: r, className: o, "data-codex-web-composer-actions": ``, children: n })),
+         (t[2] = n),
+         (t[3] = r),
+         (t[4] = o),
+@@ -494206,7 +494210,7 @@ function qRs(
+             D = n.timeStamp;
+             try {
+               return (
+-                (k = n.key === `Enter` && !n.ctrlKey && !n.metaKey && !n.altKey && !n.shiftKey && window.matchMedia(`(max-width: 768px)`).matches ? !1 : O?.(n)),
++                (k = n.key === `Enter` && !n.ctrlKey && !n.metaKey && !n.altKey && !n.shiftKey && window.matchMedia(`(max-width: 1024px)`).matches ? !1 : O?.(n)),
+                 k === !0
+                   ? (E.emit(`submit`, D), !0)
+                   : (t.props.handleKeyDown?.call(t, e, n) ?? !1)
+--- a/webview/assets/app-primary-844e405f2b90.js
++++ b/webview/assets/app-primary-844e405f2b90.js
+@@ -278595,11 +278595,12 @@ function Hui(e) {
+     {
+       serviceTierDefaults: n,
+       conversationId: r,
+-      hideLabel: i,
++      hideLabel: webHideLabel,
+       home: a,
+       permissionsCwdOverride: o,
+       permissionsHostId: s,
+     } = e,
++    i = webHideLabel && !window.__ELECTRON_SHIM__?.isMobileUI?.(),
+     c = Jd(B_),
+     l = (0, e9.useRef)(null),
+     u = c.value.kind === `local` && c.value.placement === `side` && r == null,

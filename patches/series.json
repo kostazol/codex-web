@@ -28,7 +28,8 @@
     "webview-thread-activity.patch",
     "webview-activity-view.patch",
     "webview-root-urls.patch",
-    "webview-browser-audio-host.patch"
+    "webview-browser-audio-host.patch",
+    "webview-mobile-composer.patch"
   ],
   "windowsArchiveSha256": "04862a659c6a90fc50514d8c0b8016709d97dece58839726c57495ed72f1d9f0"
 }

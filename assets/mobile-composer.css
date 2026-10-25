@@ -1,0 +1,173 @@
+/* OpenChamber-inspired mobile composition, using the original Codex editor.
+   No element reparenting, duplicate editor, draft store or capture lifecycle.
+   Recording/expanded document composers retain their native control layout. */
+@media (max-width: 1024px) {
+  [data-composer-body]:has([data-codex-web-composer="adaptive"]) {
+    padding: 6px 8px !important;
+  }
+  [data-composer-body]:has([data-codex-web-composer="adaptive"])
+    [data-composer-attachments]:empty {
+    display: none;
+  }
+  [data-codex-web-composer="adaptive"]:not([data-dictation-view]) {
+    display: grid !important;
+    grid-template-columns: 44px minmax(0, 1fr) minmax(0, 1fr) 96px !important;
+    grid-template-rows: auto auto !important;
+    gap: 0 !important;
+    align-items: center;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  /* Expose native groups as grid items without moving React-owned nodes.
+     Select by explicit upstream slots and controls, never bundle class hashes. */
+  [data-codex-web-composer="adaptive"]:not([data-dictation-view])
+    :is(
+      [data-codex-web-composer-slot="leading"],
+      [data-codex-web-composer-slot="leading"] > div,
+      [data-codex-web-composer-slot="trailing"]
+    ),
+  [data-codex-web-composer="adaptive"]:not([data-dictation-view])
+    [data-codex-web-composer-slot="trailing"]
+    :is(div, span):has([data-codex-intelligence-trigger]) {
+    display: contents !important;
+  }
+  [data-codex-web-composer="adaptive"]:not([data-dictation-view])
+    [data-codex-web-composer-slot="input"] {
+    grid-column: 2 / 4 !important;
+    grid-row: 1 !important;
+    margin: 0 !important;
+    min-width: 0;
+  }
+  [data-codex-web-composer="adaptive"]:not([data-dictation-view])
+    [data-composer-input] {
+    padding: 0 6px !important;
+    margin: 0 !important;
+  }
+  [data-codex-web-composer="adaptive"]:not([data-dictation-view])
+    [data-rich-text-layout] {
+    --composer-editor-min-height: 24px;
+    --composer-editor-line-height: 24px;
+    min-height: 24px !important;
+    max-height: 48px !important;
+    padding: 10px 0 !important;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  [data-codex-web-composer="adaptive"]:not([data-dictation-view])
+    [contenteditable="true"] {
+    min-height: 24px !important;
+    line-height: 24px !important;
+  }
+  /* A long draft remains available in the same editor, but does not consume
+     transcript space while reading. Tapping it restores the full native text. */
+  [data-codex-web-composer="adaptive"]:not([data-dictation-view]):not(
+      [data-codex-web-expanded="true"]
+    )
+    [data-rich-text-layout] {
+    max-height: 24px !important;
+    overflow: hidden;
+  }
+  [data-codex-web-composer="adaptive"]:not([data-dictation-view]):not(
+      [data-codex-web-expanded="true"]
+    )
+    [contenteditable="true"] {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  [data-codex-web-composer="adaptive"]:not([data-dictation-view]):not(
+      [data-codex-web-expanded="true"]
+    )
+    [contenteditable="true"]
+    > p:not([data-empty-paragraph="true"]) {
+    display: inline;
+  }
+  [data-codex-web-composer="adaptive"]:not([data-dictation-view]):not(
+      [data-codex-web-expanded="true"]
+    )
+    [contenteditable="true"]
+    > p:not(:last-child)::after {
+    content: " ";
+  }
+  [data-codex-web-composer="adaptive"]:not([data-dictation-view])
+    [data-composer-navigation-target="add-context"] {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    justify-self: start;
+  }
+  [data-codex-web-composer="adaptive"]:not([data-dictation-view])
+    [data-codex-web-composer-actions] {
+    grid-column: 4 !important;
+    grid-row: 1 !important;
+    justify-self: end;
+  }
+  [data-codex-web-composer="adaptive"]:not([data-dictation-view])
+    [data-composer-navigation-target="permissions"] {
+    grid-column: 1 / 3 !important;
+    grid-row: 2 !important;
+    justify-self: start;
+    max-width: 100%;
+    min-width: 0 !important;
+    padding-inline: 6px !important;
+    font-size: 12px !important;
+  }
+  [data-codex-web-composer="adaptive"]:not([data-dictation-view])
+    [data-codex-intelligence-trigger] {
+    grid-column: 3 / 5 !important;
+    grid-row: 2 !important;
+    justify-self: end;
+    min-width: 0 !important;
+    max-width: 100%;
+    padding-inline: 6px !important;
+    font-size: 12px !important;
+  }
+  [data-codex-web-composer="adaptive"]
+    :is(
+      [data-composer-navigation-target="permissions"],
+      [data-codex-intelligence-trigger]
+    )
+    [data-composer-footer-collapse] {
+    display: inline-flex !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    opacity: 1 !important;
+  }
+  /* The same editor expands in place. Focus and open controls hold it open;
+     dictation uses the untouched upstream recording layout above. */
+  [data-codex-web-composer="adaptive"]:not(
+      [data-dictation-view]
+    )[data-codex-web-expanded="true"]
+    [data-codex-web-composer-slot="input"] {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+  }
+  [data-codex-web-composer="adaptive"]:not(
+      [data-dictation-view]
+    )[data-codex-web-expanded="true"]
+    [data-rich-text-layout] {
+    max-height: min(
+      180px,
+      calc(var(--codex-web-viewport-height, 100dvh) * 0.28)
+    ) !important;
+  }
+  [data-codex-web-composer="adaptive"]:not(
+      [data-dictation-view]
+    )[data-codex-web-expanded="true"]
+    [data-composer-navigation-target="add-context"],
+  [data-codex-web-composer="adaptive"]:not(
+      [data-dictation-view]
+    )[data-codex-web-expanded="true"]
+    [data-codex-web-composer-actions] {
+    grid-row: 2 !important;
+  }
+  [data-codex-web-composer="adaptive"]:not(
+      [data-dictation-view]
+    )[data-codex-web-expanded="true"]
+    :is(
+      [data-composer-navigation-target="permissions"],
+      [data-codex-intelligence-trigger]
+    ) {
+    grid-row: 3 !important;
+  }
+}

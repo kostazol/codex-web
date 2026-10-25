@@ -1,4 +1,6 @@
 import mobileStyles from "../../assets/mobile.css?inline";
+import composerStyles from "../../assets/mobile-composer.css?inline";
+import { installMobileComposer } from "./mobile-composer";
 
 /** Browser layout only. All chat state and actions remain in Desktop React. */
 export function installMobileUI(setSidebarOpen: (open: boolean) => void): void {
@@ -7,8 +9,9 @@ export function installMobileUI(setSidebarOpen: (open: boolean) => void): void {
   // a new mobile controller using an older desktop layout.
   const style = document.createElement("style");
   style.id = "codex-web-mobile-styles";
-  style.textContent = mobileStyles;
+  style.textContent = mobileStyles + composerStyles;
   document.head.append(style);
+  installMobileComposer();
   const viewport = window.visualViewport;
   const updateViewport = () => {
     // Do not fight accessibility pinch zoom by resizing the application underneath it.
